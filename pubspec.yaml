@@ -51,6 +51,10 @@ dependencies:
   permission_handler: ^9.2.0
   flutter_reactive_ble: ^5.0.2
   top_snackbar_flutter: ^2.1.1
+  firebase_core: ^1.23.0
+  cloud_firestore: ^3.4.9
+  firebase_auth: ^3.10.0
+  google_sign_in: ^5.4.2
 
 
 dev_dependencies:
