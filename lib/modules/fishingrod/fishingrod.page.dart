@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:print_ticket/modules/fishingrod/fishingrod.model.dart';
-import 'package:print_ticket/modules/fishingrod/views/fishingrod.item.dart';
-import 'package:print_ticket/services/repositories/fishingrod.repository.dart';
-import 'package:provider/provider.dart';
+import 'package:print_ticket/models/fishingrods.dart';
 
-import 'views/create.view.dart';
+import 'package:print_ticket/modules/fishingrod/fishingrod.model.dart';
+import 'package:provider/provider.dart';
 
 class FishingrodPage extends StatefulWidget {
   const FishingrodPage({super.key});
@@ -22,11 +18,11 @@ class _FishingrodPageState extends State<FishingrodPage> {
   @override
   void initState() {
     super.initState();
-    getBoxs();
+    initData();
   }
 
-  getBoxs() async {
-    await _model.repoGetBox();
+  initData() async {
+    _model.getFishingRods();
   }
 
   @override
@@ -36,123 +32,231 @@ class _FishingrodPageState extends State<FishingrodPage> {
       builder: ((context, child) =>
           Consumer<FishingrodModel>(builder: (context, model, child) {
             return Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                title: const Text('Cần câu'),
-                actions: [
-                  ElevatedButton.icon(
-                      onPressed: () {
-                        showModalBottomSheet<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Container(
-                              height: MediaQuery.of(context).size.height * 1/2,
-                              color: Colors.grey[100],
-                              child: Form(
-                                key: _formKey,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Expanded(
-                                        flex: 1,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: TextFormField(
-                                              controller: model
-                                                  .fishingrodCodeController,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Điền mã cần';
-                                                }
-                                                return null;
-                                              },
-                                              decoration: const InputDecoration(
-                                                labelText: 'Mã cần câu *',
-                                              )),
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: TextFormField(
-                                              controller: model
-                                                  .fishingrodNameController,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Điền tên cần';
-                                                }
-                                                return null;
-                                              },
-                                              decoration: const InputDecoration(
-                                                labelText: 'Tên cần câu *',
-                                              )),
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: TextFormField(
-                                              controller: model
-                                                  .fishingrodPriceController,
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              validator: (value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
-                                                  return 'Điền giá cần';
-                                                }
-                                                return null;
-                                              },
-                                              decoration: const InputDecoration(
-                                                labelText: 'Giá cần (K)*',
-                                              )),
-                                        )),
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          if (_formKey.currentState!
-                                              .validate()) {
-                                            model.createFishingrod();
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                  content:
-                                                      Text('Processing Data')),
-                                            );
-                                          }
-                                        },
-                                        child: const Text('Tạo')),
-                                    const SizedBox(
-                                      height: 64,
-                                    )
-                                    // ElevatedButton(
-                                    //   child: const Text('Close BottomSheet'),
-                                    //   onPressed: () => Navigator.pop(context),
-                                    // ),
-                                  ],
+                resizeToAvoidBottomInset: false,
+                floatingActionButton: FloatingActionButton(
+                    onPressed: model.getFishingRods,
+                    child: const Icon(Icons.refresh)),
+                appBar: AppBar(
+                  title: const Text('Cần câu'),
+                  actions: [
+                    ElevatedButton.icon(
+                        onPressed: () {
+                          show(model, true, '');
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Thêm'))
+                  ],
+                ),
+                body: FutureBuilder(
+                    future: _model.fishinGrodsList,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<FishingRods>> snapshot) {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: model.retrievedFishinGrods.length,
+                          itemBuilder: (context, index) {
+                            final FishingRods fishingRods =
+                                model.retrievedFishinGrods[index];
+                            return SizedBox(
+                              height: 130,
+                              child: Card(
+                                margin: const EdgeInsets.all(10),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: ListTile(
+                                      title: Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 5),
+                                        child: Text(
+                                          fishingRods.name.toString(),
+                                          style: const TextStyle(
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      subtitle: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(fishingRods.codeRod.toString(),
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text('${fishingRods.price} VNĐ',
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold))
+                                        ],
+                                      ),
+                                      trailing: SizedBox(
+                                        width: 100,
+                                        child: Row(
+                                          children: [
+                                            IconButton(
+                                                onPressed: () {
+                                                  show(
+                                                      model,
+                                                      false,
+                                                      fishingRods.id
+                                                          .toString());
+                                                },
+                                                icon: const Icon(Icons.edit)),
+                                            IconButton(
+                                                onPressed: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (
+                                                        BuildContext context,
+                                                      ) =>
+                                                          AlertDialog(
+                                                            title: const Center(
+                                                              child: Text(
+                                                                  'Xóa cần câu?'),
+                                                            ),
+                                                            content: Text(
+                                                              fishingRods.name
+                                                                  .toString(),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            actions: <Widget>[
+                                                              TextButton(
+                                                                onPressed: () =>
+                                                                    Navigator.pop(
+                                                                        context,
+                                                                        'Không'),
+                                                                child:
+                                                                    const Text(
+                                                                        'Không'),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed: () {
+                                                                  model.deleteFishingRod(
+                                                                      fishingRods
+                                                                          .id
+                                                                          .toString());
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                        'Xóa'),
+                                                              ),
+                                                            ],
+                                                          ));
+                                                },
+                                                icon: const Icon(Icons.delete)),
+                                          ],
+                                        ),
+                                      )),
                                 ),
                               ),
                             );
                           },
                         );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    }));
+          })),
+    );
+  }
+
+  void show(FishingrodModel model, bool isAdd, String fishingRodsID) {
+    showModalBottomSheet<void>(
+      context: context,
+      enableDrag: false,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets,
+          child: Container(
+            height: MediaQuery.of(context).size.height * 1 / 2,
+            color: Colors.grey[100],
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                            controller: model.fishingrodCodeController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Điền mã cần';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Mã cần câu *',
+                            )),
+                      )),
+                  Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                            controller: model.fishingrodNameController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Điền tên cần';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Tên cần câu *',
+                            )),
+                      )),
+                  Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextFormField(
+                            controller: model.fishingrodPriceController,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Điền giá cần';
+                              }
+                              return null;
+                            },
+                            decoration: const InputDecoration(
+                              labelText: 'Giá cần (K)*',
+                            )),
+                      )),
+                  ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          isAdd == true
+                              ? model.createFishingrod()
+                              : model.updateFishingRod(fishingRodsID);
+                          Navigator.pop(context);
+                        }
                       },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Thêm'))
+                      child: isAdd == true
+                          ? const Text('Tạo')
+                          : const Text('Cập nhật')),
+                  const SizedBox(
+                    height: 64,
+                  )
                 ],
               ),
-              body: Column(children: [
-                Expanded(
-                    flex: 1,
-                    child: ListView.builder(
-                      itemCount: model.fishingrods.length,
-                      itemBuilder: ((context, index) => FishingrodItem(
-                            fishingRod: model.fishingrods[index],
-                          )),
-                    )),
-              ]),
-            );
-          })),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,35 +1,15 @@
-import 'package:blue_print_pos/blue_print_pos.dart';
-import 'package:blue_print_pos/models/blue_device.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:intl/intl.dart';
-import 'package:print_ticket/models/ticket.dart';
+import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
-import 'package:print_ticket/modules/dashboard/view/ticket.item.view.dart';
 import 'package:provider/provider.dart';
 
-import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
-
-import 'package:blue_print_pos/blue_print_pos.dart';
-import 'package:blue_print_pos/models/blue_device.dart';
-import 'package:blue_print_pos/models/connection_status.dart';
-import 'package:blue_print_pos/receipt/receipt_section_text.dart';
-import 'package:blue_print_pos/receipt/receipt_text_size_type.dart';
-import 'package:blue_print_pos/receipt/receipt_text_style_type.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as RB;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
-import '../configuation/demo.print.dart';
+import '../../models/tickets.dart';
 import '../ticket/ticket.page.dart';
+import 'view/ticket.item.view.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -39,7 +19,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  DashboardModel _model = DashboardModel();
+  final DashboardModel _model = DashboardModel();
+  final AuthModel _auth = AuthModel();
 
   @override
   void initState() {
@@ -48,12 +29,14 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   initData() async {
-    _model.getTicketBox();
-    _model.onScanPressed();
+    await _model.getTicketBox();
+    // _model.onScanPressed();
+    await _model.prepareStorage();
   }
 
   @override
   Widget build(BuildContext context) {
+    User? user = _auth.user;
     return ChangeNotifierProvider<DashboardModel>(
       create: (_) => _model,
       builder: (context, widgets) => Consumer<DashboardModel>(
@@ -73,80 +56,133 @@ class _DashboardPageState extends State<DashboardPage> {
               appBar: AppBar(
                 title: const Text('CÁC VÉ HÔM NAY'),
                 actions: [
-                  TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const DemoPrintPage(
-                                      title: 'Demo Print Page',
-                                    )));
-                      },
-                      child: const Text(
-                        'Kiểm tra máy in',
-                        style: TextStyle(color: Colors.white),
-                      ))
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TicketPage()));
+                    },
+                    label: const Text('Thêm'),
+                  )
                 ],
               ),
-              floatingActionButton: FloatingActionButton(
-                heroTag: "createTicket",
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const TicketPage()));
-                },
-                child: const Icon(Icons.add),
+              drawer: Drawer(
+                child: ListView(
+                  // Important: Remove any padding from the ListView.
+                  padding: EdgeInsets.zero,
+                  children: [
+                    DrawerHeader(
+                      decoration: const BoxDecoration(
+                        color: Colors.blue,
+                      ),
+                      child: Text(user?.email ?? ''),
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.print,
+                        color: Colors.blue,
+                      ),
+                      title: const Text(
+                        'Tìm kiếm máy in',
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.import_export,
+                        color: Colors.blue,
+                      ),
+                      title: const Text(
+                        'Xuất excel',
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        (model.rootPath != null)
+                            ? model.pickDir(context)
+                            : null;
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.verified_user,
+                        color: Colors.blue,
+                      ),
+                      title: const Text(
+                        'Phân quyền',
+                        style: TextStyle(
+                          color: Colors.blue,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
               ),
               backgroundColor: const Color(0xffEEEEEE),
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: model.isLoading
-                    ? const Center(
-                        child: Text('Loading...'),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            child: Text(
-                              'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+              body: FutureBuilder(
+                  future: _model.ticketsList,
+                  builder: (context, AsyncSnapshot<List<Tickets>> snapshot) {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Center(
+                                child: Text(
+                                  'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: RefreshIndicator(
-                              onRefresh: (() async {
-                                await model.getTicketBox();
-                                // await _model.onScanPressed();
-                              }),
-                              child: ListView.builder(
-                                  itemCount: model.tickets.length,
-                                  itemBuilder: (context, index) {
-                                    return TicketItemView(
-                                      ticket: model.tickets[index],
-                                      onDeleteClick: () {
-                                        model
-                                            .deleteTicket(model.tickets[index]);
-                                      },
-                                      onPrintClick: () async {
-                                        // await model
-                                        //     .onPrint(model.tickets[index]);
-                                        await _model.onPrintReceipt(
-                                            model.tickets[index]);
-                                      },
-                                    );
-                                  }),
-                            ),
-                          )
-                        ],
-                      ),
-              ),
+                            Expanded(
+                              flex: 1,
+                              child: RefreshIndicator(
+                                onRefresh: (() async {
+                                  await _model.getTicketBox();
+                                }),
+                                child: ListView.builder(
+                                    itemCount: model.retrievedTickets.length,
+                                    itemBuilder: (context, index) {
+                                      return TicketItemView(
+                                        ticket: model.retrievedTickets[index],
+                                        onDeleteClick: model,
+                                        onPrintClick: () async {
+                                          // await model
+                                          //     .onPrint(model.tickets[index]);
+                                          // await _model.onPrintReceipt(
+                                          //     model.tickets[index]);
+                                        },
+                                      );
+                                    }),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text('Chưa có dữ liệu!'),
+                      );
+                    }
+                  }),
             ),
           );
         },

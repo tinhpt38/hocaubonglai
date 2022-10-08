@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:print_ticket/models/customers.dart';
 import 'package:print_ticket/modules/customer/customer.model.dart';
-import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
-import 'package:print_ticket/modules/dashboard/view/ticket.item.view.dart';
 import 'package:provider/provider.dart';
 
 class CustomerPage extends StatefulWidget {
@@ -15,6 +12,7 @@ class CustomerPage extends StatefulWidget {
 
 class _CustomerPageState extends State<CustomerPage> {
   final CustomerModel _model = CustomerModel();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -23,7 +21,7 @@ class _CustomerPageState extends State<CustomerPage> {
   }
 
   initData() async {
-    _model.getCustomerBox();
+    _model.getCustomer();
   }
 
   @override
@@ -33,63 +31,166 @@ class _CustomerPageState extends State<CustomerPage> {
       builder: (context, widgets) => Consumer<CustomerModel>(
         builder: (context, model, widget) {
           return SafeArea(
-            child: Scaffold(
-              floatingActionButton: FloatingActionButton(
-                child: const Icon(Icons.refresh),
-                onPressed: ()async{
-                  model.getCustomerBox();
-                },
-              ),
-              backgroundColor: const Color(0xffEEEEEE),
-              body: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: model.isLoading ? const Center( child:   Text('Loading...'),): RefreshIndicator(
-                  onRefresh: (()async{
-                      await model.getCustomerBox();
-                  }),
-                  child: Column(
-                    children: [
-                               const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text(
-                        'DANH SÁCH KHÁCH HÀNG',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                      Expanded(
-                        flex: 1,
-                        child: ListView.builder(
-                            itemCount: model.customers.length,
-                            itemBuilder: (context, index) {
-                              return  Container(
-                                color: Colors.white70,
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 12 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text('${model.customers[index].fullname?.toUpperCase()}', textAlign: TextAlign.start,),
+              child: Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Danh sách khách hàng'),
+                    actions: [
+                      ElevatedButton.icon(
+                          onPressed: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              enableDrag: false,
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return Padding(
+                                  padding: MediaQuery.of(context).viewInsets,
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        1 /
+                                        3,
+                                    color: Colors.grey[100],
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Expanded(
+                                              flex: 1,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                    controller: model
+                                                        .fullNameController,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Điền tên khách hàng';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText:
+                                                          'Tên khách hàng *',
+                                                    )),
+                                              )),
+                                          Expanded(
+                                              flex: 1,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    controller:
+                                                        model.phoneController,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Điền số điện thoại';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText:
+                                                          'Số điện thoại *',
+                                                    )),
+                                              )),
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                if (_formKey.currentState!
+                                                    .validate()) {
+                                                  model.createCustomer();
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              child: const Text('Tạo')),
+                                          const SizedBox(
+                                            height: 64,
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text('SĐT: ${model.customers[index].phone}'),
-                                    )
-                                  ],
-                                )
-                              );
-                            }),
-                      ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('Thêm'))
                     ],
                   ),
-                ),
-              ),
-            ),
-          );
+                  floatingActionButton: FloatingActionButton(
+                      onPressed: model.getCustomer,
+                      child: const Icon(Icons.refresh)),
+                  backgroundColor: const Color(0xffEEEEEE),
+                  body: FutureBuilder(
+                      future: _model.customersList,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Customers>> snapshot) {
+                        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: model.retrievedCustomersList.length,
+                            itemBuilder: (context, index) {
+                              final Customers customers =
+                                  model.retrievedCustomersList[index];
+                              return Card(
+                                margin: const EdgeInsets.all(10),
+                                child: ListTile(
+                                  title: Text(customers.fullname.toString()),
+                                  subtitle: Text(customers.phone.toString()),
+                                  trailing: IconButton(
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (
+                                              BuildContext context,
+                                            ) =>
+                                                AlertDialog(
+                                                  title: const Center(
+                                                    child:
+                                                        Text('Xóa khách hàng?'),
+                                                  ),
+                                                  content: Text(
+                                                    customers.fullname
+                                                        .toString(),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context, 'Không'),
+                                                      child:
+                                                          const Text('Không'),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        model.deleteCustomers(
+                                                            customers.id
+                                                                .toString());
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child: const Text('Xóa'),
+                                                    ),
+                                                  ],
+                                                ));
+                                      },
+                                      icon: const Icon(Icons.delete)),
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      })));
         },
       ),
     );

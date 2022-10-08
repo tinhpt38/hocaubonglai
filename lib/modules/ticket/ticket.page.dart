@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 import 'package:provider/provider.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-import '../../models/fishingrod.dart';
+import '../dashboard/dashboard.model.dart';
 
 class TicketPage extends StatefulWidget {
   const TicketPage({super.key});
@@ -22,10 +23,11 @@ class _TicketPageState extends State<TicketPage> {
   }
 
   initialData() async {
-    await _model.getFishingrodsBox();
-    await _model.getCustomerBox();
-    await _model.getTicketBox();
+    await _model.getCustomer();
+    await _model.getFishingRod();
   }
+
+  final DashboardModel _dashboardModel = DashboardModel();
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +35,8 @@ class _TicketPageState extends State<TicketPage> {
       create: (_) => _model,
       builder: ((context, child) =>
           Consumer<TicketModel>(builder: (context, model, child) {
-            Future.delayed(Duration.zero,(){
-              if(model.isCreatedSuccessfully){
+            Future.delayed(Duration.zero, () {
+              if (model.isCreatedSuccessfully) {
                 Navigator.pop(context);
               }
             });
@@ -64,15 +66,18 @@ class _TicketPageState extends State<TicketPage> {
                                     const Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 8),
-                                        child: Text(
-                                          'THÔNG TIN KHÁCH',
-                                          style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold),
+                                        child: Center(
+                                          child: Text(
+                                            'THÔNG TIN KHÁCH',
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         )),
                                     TextFormField(
                                         controller: model.phoneController,
                                         keyboardType: TextInputType.number,
+                                        onChanged: _model.setNameFromPhone,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Điền số điện thoại khách hàng';
@@ -83,7 +88,8 @@ class _TicketPageState extends State<TicketPage> {
                                           labelText: 'Số điện thoại:',
                                         )),
                                     TextFormField(
-                                        controller: model.fullNameController,
+                                        controller: model.fullNameController
+                                          ..text,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Điền họ tên khách hàng';
@@ -99,12 +105,17 @@ class _TicketPageState extends State<TicketPage> {
                                     const Padding(
                                         padding:
                                             EdgeInsets.symmetric(vertical: 8),
-                                        child: Text(
-                                          'THÔNG TIN VÉ',
-                                          style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold),
+                                        child: Center(
+                                          child: Text(
+                                            'THÔNG TIN VÉ',
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         )),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Container(
                                       width: double.infinity,
                                       decoration: BoxDecoration(
@@ -132,8 +143,8 @@ class _TicketPageState extends State<TicketPage> {
                                           controller: model.liveStageController,
                                           keyboardType: TextInputType.number,
                                           onChanged: (_) {
-                                            model.getPrice();
                                             model.setTimeOut();
+                                            model.getPrice();
                                           },
                                           decoration: const InputDecoration(
                                             hintText: 'Nhập vào số ca',
@@ -141,7 +152,7 @@ class _TicketPageState extends State<TicketPage> {
                                           )),
                                     ),
                                     Container(
-                                      margin: const EdgeInsets.only(top: 12),
+                                        margin: const EdgeInsets.only(top: 12),
                                         width: double.infinity,
                                         decoration: BoxDecoration(
                                             border: Border.all(
@@ -174,30 +185,44 @@ class _TicketPageState extends State<TicketPage> {
                                       child: TextFormField(
                                           controller: model
                                               .fishingroldQuantityController,
-                                          keyboardType:
-                                              TextInputType.number,
+                                          keyboardType: TextInputType.number,
                                           onChanged: (_) {
                                             model.getPrice();
                                           },
-                                          decoration:
-                                              const InputDecoration(
+                                          decoration: const InputDecoration(
                                             labelText: 'Số cần:',
                                           )),
                                     ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    const Text(
+                                      '  Loại cần',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: DropdownButton<FishingRod>(
-                                        value: model.selectedFishingrod,
-                                        hint: const Text('Loại cần: '),
-                                        items: model.fishingrods
-                                            .map((e) => DropdownMenuItem(
-                                                  value: e,
-                                                  child:
-                                                      Text(e.name ?? ""),
-                                                ))
-                                            .toList(),
-                                        onChanged:
-                                            model.onChangeFhisingrod,
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2(
+                                          hint: const Text(''),
+                                          isExpanded: true,
+                                          items: model.fishingRodName
+                                              .map((item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item,
+                                                    child: Text(
+                                                      '$item VNĐ',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: model.selectedValue,
+                                          onChanged: (_) {
+                                            model.onChangeTypeFishingRod(_);
+                                            model.getPrice();
+                                          },
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -207,7 +232,7 @@ class _TicketPageState extends State<TicketPage> {
                                           border: Border.all(
                                               color: Colors.black87, width: 1)),
                                       child: Text(
-                                        'Giá vé: ${model.total} K',
+                                        'Giá vé: ${model.total} VNĐ',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                             fontSize: 24,
@@ -217,9 +242,21 @@ class _TicketPageState extends State<TicketPage> {
                                     const SizedBox(
                                       height: 32,
                                     ),
-                                    TextButton(
-                                        onPressed: model.createTicket,
-                                        child: const Text('TẠO VÀ IN VÉ'))
+                                    Center(
+                                      child: ElevatedButton(
+                                          onPressed: () async {
+                                            model.createTicket();
+                                            // Navigator.pushAndRemoveUntil(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           const DashboardPage()),
+                                            //   (Route<dynamic> route) => false,
+                                            // );
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('TẠO VÀ IN VÉ')),
+                                    )
                                   ],
                                 ),
                               ),

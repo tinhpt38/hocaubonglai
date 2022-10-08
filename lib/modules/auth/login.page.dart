@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/home/home.page.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
@@ -18,12 +16,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-  
     super.initState();
     Authentication.initializeFirebase();
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

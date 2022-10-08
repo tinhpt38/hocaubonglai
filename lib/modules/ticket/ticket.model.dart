@@ -1,20 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:print_ticket/models/customer.dart';
-import 'package:print_ticket/models/ticket.dart';
-import 'package:print_ticket/modules/ticket/ticket.print.dart';
-import 'package:print_ticket/services/repositories/customer_repository.dart';
-import 'package:print_ticket/services/repositories/ticket_repository.dart';
-
-import '../../models/fishingrod.dart';
+import 'package:print_ticket/models/customers.dart';
+import 'package:print_ticket/models/fishingrods.dart';
+import '../../services/repositories/customer_repository.dart';
 import '../../services/repositories/fishingrod.repository.dart';
+import '../../services/repositories/ticket_repository.dart';
+import '../dashboard/dashboard.model.dart';
 
 class TicketModel extends ChangeNotifier {
-  final FishingrodRepository _fishingrodRepository = FishingrodRepository();
-  final CustomerRepository _customerRepository = CustomerRepository();
-  final TicketRepository _ticketRepository = TicketRepository();
-  // final TextEditingController _timeInController = TextEditingController();
-  // TextEditingController get timeInController => _timeInController;
+  TicketRepository ticketRepo = TicketRepository();
 
   String _timeIn = '';
   String get timeIn => _timeIn;
@@ -50,70 +45,14 @@ class TicketModel extends ChangeNotifier {
   final TextEditingController _phoneController = TextEditingController();
   TextEditingController get phoneController => _phoneController;
 
-  final TextEditingController _fullNameController = TextEditingController();
+  final TextEditingController _fullNameController =
+      TextEditingController(text: '');
   TextEditingController get fullNameController => _fullNameController;
 
   final TextEditingController _fishingroldQuantityController =
       TextEditingController(); //
   TextEditingController get fishingroldQuantityController =>
       _fishingroldQuantityController;
-
-  List<FishingRod> _fishingrods = [];
-  List<FishingRod> get fishingrods => _fishingrods;
-
-  List<Customer> _customers = [];
-  List<Customer> get customers => _customers;
-
-  List<Ticket> _tickets = [];
-  List<Ticket> get tickets => _tickets;
-
-  FishingRod? _selectedFishingrod;
-  FishingRod? get selectedFishingrod => _selectedFishingrod;
-
-  int _liveStageConvert = 1;
-  int get liveStageConvert => _liveStageConvert;
-
-  setLiveStage(int value) {
-    _liveStageConvert = value;
-    notifyListeners();
-  }
-
-  double _total = 0;
-  double get total => _total;
-
-  getFishingrodsBox() async {
-    await _fishingrodRepository.getBox();
-    _fishingrods = _fishingrodRepository.gets();
-    notifyListeners();
-  }
-
-  getCustomerBox() async {
-    await _customerRepository.getBox();
-    _customers = _customerRepository.gets();
-    notifyListeners();
-  }
-
-  getTicketBox() async {
-    await _ticketRepository.getBox();
-    _tickets = _ticketRepository.gets();
-    notifyListeners();
-  }
-
-  onChangeFhisingrod(FishingRod? value) {
-    _selectedFishingrod = value;
-    getPrice();
-    notifyListeners();
-  }
-
-  getPrice() {
-    var quantity = double.tryParse(_fishingroldQuantityController.text);
-    var price = _selectedFishingrod?.price ?? 0;
-    var liveStage = int.tryParse(_liveStageController.text);
-    liveStage ??= 1;
-    quantity ??= 1;
-    _total = quantity * price * liveStage;
-    notifyListeners();
-  }
 
   parseDDMMYYYYHHM(String date) {
     var inputFormat = DateFormat('HH:mm dd/MM/yyyy');
@@ -127,49 +66,113 @@ class TicketModel extends ChangeNotifier {
     return value;
   }
 
-  bool _isCreatedSuccessfully = false;
+  final bool _isCreatedSuccessfully = false;
   bool get isCreatedSuccessfully => _isCreatedSuccessfully;
 
-  createTicket() async {
-    Customer? customer;
- 
-    List<Customer> ctmp = _customers.where((element) {
-      return element.phone == phoneController.text.trim();
-    }).toList();
+  //hiep code
 
-    if (ctmp.isNotEmpty) {
-      customer = ctmp[0];
+  setNameFromPhone(String text) {
+    if (text.isNotEmpty && _customersMap.containsKey(int.parse(text))) {
+      _fullNameController.text = _customersMap[int.parse(text)].toString();
+      notifyListeners();
+    } else {
+      _fullNameController.text = '';
     }
+  }
 
-    // ignore: prefer_conditional_assignment, unnecessary_null_comparison
-    if (customer == null) {
-      customer = Customer(
-        phone: phoneController.text,
-        fullname: fullNameController.text,
-      );
-      _customerRepository.add(customer);
+  final CustomerRepository customerRepo = CustomerRepository();
+
+  final Map<int, String> _customersMap = {};
+  Map<int, String> get customersMap => _customersMap;
+
+  List<String> phoneCustomers = [];
+
+  List<Customers> _retrievedCustomersList = [];
+  getCustomer() async {
+    _retrievedCustomersList = await customerRepo.retrieveCustomers();
+    for (int i = 0; i < _retrievedCustomersList.length; i++) {
+      _customersMap[int.parse(_retrievedCustomersList[i].phone.toString())] =
+          _retrievedCustomersList[i].fullname.toString();
+      phoneCustomers.add(_retrievedCustomersList[i].phone.toString());
+      notifyListeners();
     }
+  }
 
-    var ticket = Ticket(
-        id: '',
-        date: parseDDMMYYYY(_timeIn),
-        timeIn: parseDDMMYYYYHHM(_timeIn),
-        timeOut: parseDDMMYYYYHHM(_timeOut),
-        seats: _seatsController.text,
-        fishingrod: _selectedFishingrod,
-        fishingrodQuantity: int.tryParse(_fishingroldQuantityController.text),
-        price: total,
-        customer: customer);
+  final FishingrodRepository fishingRodRepo = FishingrodRepository();
+  List<FishingRods> _retrievedFishingRodList = [];
+  final List<String> _fishingRodName = [];
+  List<String> get fishingRodName => _fishingRodName;
+  final List<String> _fishingRodPrice = [];
+  List<String> get fishingRodPrice => _fishingRodPrice;
+  final Map<String, String> _fishingRodMap = {};
+  Map<String, String> get fishingRodMap => _fishingRodMap;
 
-    await _printTicket(ticket);
+  getFishingRod() async {
+    _retrievedFishingRodList = await fishingRodRepo.retrieveFishingRods();
+    for (int i = 0; i < _retrievedFishingRodList.length; i++) {
+      _fishingRodName.add(
+          '${_retrievedFishingRodList[i].name} -- ${_retrievedFishingRodList[i].price}');
+      _fishingRodPrice.add(_retrievedFishingRodList[i].price.toString());
+      _fishingRodMap[_retrievedFishingRodList[i].name.toString()] =
+          _retrievedFishingRodList[i].price.toString();
+      notifyListeners();
+    }
+  }
 
-    _ticketRepository.add(ticket);
-    _isCreatedSuccessfully = true;
+  String? _selectedValue;
+  String? get selectedValue => _selectedValue;
+
+  onChangeTypeFishingRod(String? value) {
+    _selectedValue = value;
+    listNameFishingRod = value!.split(' -- ');
     notifyListeners();
   }
 
-  _printTicket(Ticket ticket) async {
-    // PrintTicket _printHepler = PrintTicket(ticket);
-    // await _printHepler.print();
+  List<String> listNameFishingRod = [];
+  double? price;
+  getPrice() {
+    var quantity = double.tryParse(_fishingroldQuantityController.text);
+    var liveStage = int.tryParse(_liveStageController.text);
+    liveStage ??= 1;
+    quantity ??= 1;
+
+    if (listNameFishingRod.isNotEmpty) {
+      price =
+          double.tryParse(_fishingRodMap[listNameFishingRod[0]].toString()) ??
+              1;
+    }
+    if (price != null) {
+      _total = quantity * price! * liveStage;
+    }
+    notifyListeners();
+  }
+
+  double _total = 0;
+  double get total => _total;
+
+  final DashboardModel _dashboardModel = DashboardModel();
+
+  createTicket() async {
+    await ticketRepo.ticketBox.add(({
+      'customer': fullNameController.text,
+      'phone': phoneController.text,
+      'price': _total,
+      'fishingRod': listNameFishingRod[0],
+      'fishingrodQuantity': _fishingroldQuantityController.text,
+      'seats': _seatsController.text,
+      'timeIn': _timeIn,
+      'timeOut': _timeOut
+    }));
+    if (phoneCustomers.contains(phoneController.text)) {
+    } else {
+      await customerRepo.customers.add(({
+        'fullname': fullNameController.text,
+        'phone': phoneController.text
+      }));
+
+      notifyListeners();
+    }
+    await _dashboardModel.getTicketBox();
+    notifyListeners();
   }
 }

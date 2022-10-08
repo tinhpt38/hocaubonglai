@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:print_ticket/models/ticket.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +42,7 @@ class TicketPrintView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                    'Số cần: ${model.fishingroldQuantityController.text} Loại cần: ${model.selectedFishingrod?.name ?? ""}'),
+                    'Số cần: ${model.fishingroldQuantityController.text} Loại cần: '),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),

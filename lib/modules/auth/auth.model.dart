@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 
 class AuthModel extends ChangeNotifier {
@@ -25,4 +26,5 @@ class AuthModel extends ChangeNotifier {
     setIsSigningIn(false);
     setUser(user);
   }
+
 }

@@ -1,45 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:print_ticket/services/repositories/customer_repository.dart';
 
-import '../../models/customer.dart';
-import '../../models/ticket.dart';
-import '../../services/repositories/ticket_repository.dart';
+import 'package:print_ticket/models/customers.dart';
+
+import '../../services/repositories/customer_repository.dart';
 
 class CustomerModel extends ChangeNotifier {
-  final CustomerRepository _cusRepository = CustomerRepository();
+  final CustomerRepository customerRepo = CustomerRepository();
 
-  List<Customer> _customers = [];
-  List<Customer> get customers => _customers;
+  List<Customers> _retrievedCustomersList = [];
+  List<Customers> get retrievedCustomersList => _retrievedCustomersList;
 
-  String get getCurrentDate {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
-    return formattedDate;
-  }
+  Future<List<Customers>>? _customersList;
+  Future<List<Customers>>? get customersList => _customersList;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  final TextEditingController _fullNameController = TextEditingController();
+  get fullNameController => _fullNameController;
 
-  setIsLoading(bool value) {
-    _isLoading = value;
+  final TextEditingController _phoneController = TextEditingController();
+  get phoneController => _phoneController;
+
+  getCustomer() async {
+    _retrievedCustomersList = await customerRepo.retrieveCustomers();
+    _customersList = customerRepo.retrieveCustomers();
     notifyListeners();
   }
 
-  getCustomerBox() async {
-    setIsLoading(true);
-    await _cusRepository.getBox();
-    _customers = _cusRepository.gets();
-   _customers =  _customers.reversed.toList();
-   setIsLoading(false);
+  deleteCustomers(String customerID) async {
+    await customerRepo.customers.doc(customerID).delete();
+    getCustomer();
     notifyListeners();
   }
 
-  deleteCustomer(Ticket ticket) async{
-    setIsLoading(true);
-    _customers.remove(ticket);
-    ticket.delete();
-    await getCustomerBox();
+  createCustomer() async {
+    await customerRepo.customers.add(
+        ({'fullname': fullNameController.text, 'phone': phoneController.text}));
+    getCustomer();
     notifyListeners();
+  }
+
+  clearController() {
+    _fullNameController.clear();
+    _phoneController.clear();
   }
 }

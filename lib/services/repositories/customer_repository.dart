@@ -1,35 +1,20 @@
-import 'package:hive/hive.dart';
-import 'package:print_ticket/models/customer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:print_ticket/models/customers.dart';
 
 class CustomerRepository {
-  static final CustomerRepository _instance = CustomerRepository._internal();
+  final CollectionReference customers =
+      FirebaseFirestore.instance.collection('Customers');
 
-  late Box box;
-  factory CustomerRepository() => _instance;
-  CustomerRepository._internal();
-
-  var dbName = "customers";
-
-  getBox() async {
-    box = await Hive.openBox<Customer>(dbName);
-    return box;
-  }
-
-  Box add(Customer data) {
-    box.add(data);
-    return box;
-  }
-
-  Box update(Customer data) {
-    data.save();
-    return box;
-  }
-
-  gets() {
-    return box.values.toList();
-  }
-
-  delete(Customer value) {
-    value.delete();
+  Future<List<Customers>> retrieveCustomers() async {
+    List<Customers> getCustomers = [];
+    await customers.get().then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        getCustomers.add(Customers(
+            id: doc.id,
+            fullname: doc['fullname'].toString(),
+            phone: doc['phone'].toString()));
+      }
+    });
+    return getCustomers;
   }
 }
