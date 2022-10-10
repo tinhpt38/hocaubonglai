@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:print_ticket/models/fishingrod.dart';
+
 import 'package:print_ticket/modules/customer/customer.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.page.dart';
-import 'package:print_ticket/modules/ticket/ticket.page.dart';
 
-import '../configuation/demo.print.dart';
 import '../fishingrod/fishingrod.page.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,9 +29,10 @@ class _HomePageState extends State<HomePage> {
         {
           return const FishingrodPage();
         }
-        case 3: {
+      case 3:
+        {
           // return  MyHomePage(title: 'Print config',);
-          // return  PrintApp(); 
+          // return  PrintApp();
         }
     }
   }
@@ -52,7 +51,7 @@ class _HomePageState extends State<HomePage> {
       // ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (value){
+        onTap: (value) {
           setState(() {
             _selectedIndex = value;
           });
@@ -61,7 +60,8 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.dashboard), label: 'Dashboard'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Khách'),
-          BottomNavigationBarItem(icon: Icon(Icons.line_axis), label: 'Cần câu'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.line_axis), label: 'Cần câu'),
           // BottomNavigationBarItem(icon: Icon(Icons.print), label: 'Config')
         ],
       ),

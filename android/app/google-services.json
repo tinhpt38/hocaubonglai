@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "270675623155",
+    "project_id": "hocaubonglai",
+    "storage_bucket": "hocaubonglai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270675623155:android:3f7e0a5c5d7a59eb624b86",
+        "android_client_info": {
+          "package_name": "com.example.print_ticket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270675623155-jlhpli7f9ekdrodrto33mp76h24mnb1u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-x1BCIdFlD5Yatb5MoeVQXRBEuo9vG_o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270675623155-jlhpli7f9ekdrodrto33mp76h24mnb1u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

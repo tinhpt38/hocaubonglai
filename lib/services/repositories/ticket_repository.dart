@@ -1,35 +1,27 @@
-import 'package:hive/hive.dart';
-import 'package:print_ticket/models/ticket.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:print_ticket/models/tickets.dart';
 
 class TicketRepository {
-  static final TicketRepository _instance = TicketRepository._internal();
+  final CollectionReference ticketBox =
+      FirebaseFirestore.instance.collection('Tickets');
 
-  late Box box;
-  factory TicketRepository() => _instance;
-  TicketRepository._internal();
-
-  var dbName = "tickets";
-
-  getBox() async {
-    box = await Hive.openBox<Ticket>(dbName);
-    return box;
-  }
-
-  Box add(Ticket data) {
-    box.add(data);
-    return box;
-  }
-
-  Box update(Ticket data) {
-    data.save();
-    return box;
-  }
-
-  gets() {
-    return box.values.toList();
-  }
-
-  delete(Ticket value) {
-    value.delete();
+  Future<List<Tickets>> retrieveTicket() async {
+    List<Tickets> getTicket = [];
+    await ticketBox.get().then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        getTicket.add(Tickets(
+          id: doc.id,
+          timeIn: doc['timeIn'].toString(),
+          timeOut: doc['timeOut'].toString(),
+          seats: doc['seats'].toString(),
+          fishingrodQuantity: doc['fishingrodQuantity'].toString(),
+          customer: doc['customer'].toString(),
+          price: doc['price'].toDouble(),
+          fishingrod: doc['fishingRod'].toString(),
+          phone: doc['phone'].toString(),
+        ));
+      }
+    });
+    return getTicket;
   }
 }

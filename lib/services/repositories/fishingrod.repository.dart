@@ -1,37 +1,23 @@
-import 'package:hive/hive.dart';
-import 'package:print_ticket/models/customer.dart';
-import 'package:print_ticket/models/fishingrod.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:print_ticket/models/fishingrods.dart';
 
 class FishingrodRepository {
-  static final FishingrodRepository _instance =
-      FishingrodRepository._internal();
+  final CollectionReference fishingRods =
+      FirebaseFirestore.instance.collection('FishingRod');
 
-  late Box box;
-  factory FishingrodRepository() => _instance;
-  FishingrodRepository._internal();
-
-  var dbName = "fishingrods";
-
-  getBox() async {
-    box = await Hive.openBox<FishingRod>(dbName);
-    return box;
-  }
-
-  Box add(FishingRod data) {
-    box.add(data);
-    return box;
-  }
-
-  Box update(FishingRod data) {
-    data.save();
-    return box;
-  }
-
-  gets() {
-    return box.values.toList();
-  }
-
-  delete(FishingRod value) {
-    value.delete();
+  Future<List<FishingRods>> retrieveFishingRods() async {
+    List<FishingRods> getFishingRods = [];
+    await fishingRods.get().then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        getFishingRods.add(FishingRods(
+          id: doc.id,
+          name: doc['name'].toString(),
+          codeRod: doc['codeRod'].toString(),
+          price: doc['price'].toString(),
+        ));
+      }
+    });
+    return getFishingRods;
   }
 }

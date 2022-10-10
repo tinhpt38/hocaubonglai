@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:print_ticket/models/fishingrods.dart';
 
-import '../../../models/fishingrod.dart';
+
 
 class FishingrodItem extends StatelessWidget {
-  final FishingRod? fishingRod;
+  final FishingRods? fishingRod;
   const FishingrodItem({super.key, this.fishingRod});
 
   @override
@@ -21,7 +22,7 @@ class FishingrodItem extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
             )),
-        trailing: Text("${fishingRod?.price?.toStringAsFixed(0)} K",
+        trailing: Text("${fishingRod?.price?.toString()} K",
             style: const TextStyle(
               fontSize: 14,
             )),
