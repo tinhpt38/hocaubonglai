@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:print_ticket/models/customers.dart';
@@ -150,7 +149,6 @@ class TicketModel extends ChangeNotifier {
   double _total = 0;
   double get total => _total;
 
-  final DashboardModel _dashboardModel = DashboardModel();
 
   createTicket() async {
     await ticketRepo.ticketBox.add(({
@@ -169,10 +167,7 @@ class TicketModel extends ChangeNotifier {
         'fullname': fullNameController.text,
         'phone': phoneController.text
       }));
-
-      notifyListeners();
     }
-    await _dashboardModel.getTicketBox();
     notifyListeners();
   }
 }

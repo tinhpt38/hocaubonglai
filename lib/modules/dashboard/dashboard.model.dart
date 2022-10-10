@@ -5,12 +5,15 @@ import 'package:blue_print_pos/models/blue_device.dart';
 import 'package:blue_print_pos/models/connection_status.dart';
 import 'package:excel/excel.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:print_ticket/services/repositories/user_repository.dart';
 
 import '../../models/tickets.dart';
+import '../../models/users.dart';
 import '../../services/repositories/ticket_repository.dart';
 
 class DashboardModel extends ChangeNotifier {
@@ -27,7 +30,6 @@ class DashboardModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   final TicketRepository _ticketRepo = TicketRepository();
-
   setIsLoading(bool value) {
     _isLoading = value;
     notifyListeners();
@@ -204,9 +206,6 @@ class DashboardModel extends ChangeNotifier {
       content: Text('Đã xuất file!'),
     );
 
-// Find the ScaffoldMessenger in the widget tree
-// and use it to show a SnackBar.
-// ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     notifyListeners();
   }

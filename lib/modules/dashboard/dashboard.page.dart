@@ -1,7 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
+import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
+import 'package:print_ticket/modules/home/home.model.dart';
+import 'package:print_ticket/modules/permission/permission.page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -21,7 +23,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final DashboardModel _model = DashboardModel();
   final AuthModel _auth = AuthModel();
-
+  final HomeModel _modelHome = HomeModel();
   @override
   void initState() {
     super.initState();
@@ -29,6 +31,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   initData() async {
+    await _modelHome.getUser();
     await _model.getTicketBox();
     // _model.onScanPressed();
     await _model.prepareStorage();
@@ -36,7 +39,6 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    User? user = _auth.user;
     return ChangeNotifierProvider<DashboardModel>(
       create: (_) => _model,
       builder: (context, widgets) => Consumer<DashboardModel>(
@@ -54,30 +56,50 @@ class _DashboardPageState extends State<DashboardPage> {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
+                centerTitle: !_modelHome.role,
                 title: const Text('CÁC VÉ HÔM NAY'),
                 actions: [
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.add),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const TicketPage()));
-                    },
-                    label: const Text('Thêm'),
-                  )
+                  _modelHome.role == true
+                      ? ElevatedButton.icon(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const TicketPage()));
+                          },
+                          label: const Text('Thêm'),
+                        )
+                      : Container()
                 ],
               ),
               drawer: Drawer(
                 child: ListView(
-                  // Important: Remove any padding from the ListView.
                   padding: EdgeInsets.zero,
                   children: [
-                    DrawerHeader(
-                      decoration: const BoxDecoration(
-                        color: Colors.blue,
+                    SizedBox(
+                      height: 150,
+                      child: DrawerHeader(
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                        ),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  _auth.userLogined?.photoURL.toString() ??
+                                      "")),
+                          title: Text(
+                            "${_auth.userLogined?.displayName.toString()} (${_modelHome.role == true ? "Admin" : "Nhân viên"})",
+                            style: const TextStyle(
+                              color: Colors.black,
+                            ),
+                          ),
+                          subtitle: Text(
+                            _auth.userLogined?.email.toString() ?? "",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
-                      child: Text(user?.email ?? ''),
                     ),
                     ListTile(
                       leading: const Icon(
@@ -112,52 +134,80 @@ class _DashboardPageState extends State<DashboardPage> {
                             : null;
                       },
                     ),
+                    _modelHome.role == true
+                        ? ListTile(
+                            leading: const Icon(
+                              Icons.verified_user,
+                              color: Colors.blue,
+                            ),
+                            title: const Text(
+                              'Phân quyền',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PermissionPage()));
+                            },
+                          )
+                        : Container(),
                     ListTile(
                       leading: const Icon(
-                        Icons.verified_user,
+                        Icons.logout,
                         color: Colors.blue,
                       ),
                       title: const Text(
-                        'Phân quyền',
+                        'Đăng xuất',
                         style: TextStyle(
                           color: Colors.blue,
                         ),
                       ),
                       onTap: () {
-                        Navigator.pop(context);
+                        _auth.logout();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                              maintainState: false),
+                        );
                       },
                     ),
                   ],
                 ),
               ),
               backgroundColor: const Color(0xffEEEEEE),
-              body: FutureBuilder(
-                  future: _model.ticketsList,
-                  builder: (context, AsyncSnapshot<List<Tickets>> snapshot) {
-                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              child: Center(
-                                child: Text(
-                                  'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
+              body: RefreshIndicator(
+                onRefresh: (() async {
+                  await _model.getTicketBox();
+                }),
+                child: FutureBuilder(
+                    future: _model.ticketsList,
+                    builder: (context, AsyncSnapshot<List<Tickets>> snapshot) {
+                      if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                child: Center(
+                                  child: Text(
+                                    'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: RefreshIndicator(
-                                onRefresh: (() async {
-                                  await _model.getTicketBox();
-                                }),
+                              Expanded(
+                                flex: 1,
                                 child: ListView.builder(
                                     itemCount: model.retrievedTickets.length,
                                     itemBuilder: (context, index) {
@@ -170,19 +220,20 @@ class _DashboardPageState extends State<DashboardPage> {
                                           // await _model.onPrintReceipt(
                                           //     model.tickets[index]);
                                         },
+                                        isAdmin: _modelHome.role,
                                       );
                                     }),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      return const Center(
-                        child: Text('Chưa có dữ liệu!'),
-                      );
-                    }
-                  }),
+                              )
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text('Chưa có dữ liệu!'),
+                        );
+                      }
+                    }),
+              ),
             ),
           );
         },

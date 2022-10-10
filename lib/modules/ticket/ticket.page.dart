@@ -15,6 +15,7 @@ class TicketPage extends StatefulWidget {
 
 class _TicketPageState extends State<TicketPage> {
   final TicketModel _model = TicketModel();
+  final DashboardModel _modelDashboard = DashboardModel();
   final _addTicktFormKey = GlobalKey<FormState>();
   @override
   initState() {
@@ -26,8 +27,6 @@ class _TicketPageState extends State<TicketPage> {
     await _model.getCustomer();
     await _model.getFishingRod();
   }
-
-  final DashboardModel _dashboardModel = DashboardModel();
 
   @override
   Widget build(BuildContext context) {
@@ -246,14 +245,8 @@ class _TicketPageState extends State<TicketPage> {
                                       child: ElevatedButton(
                                           onPressed: () async {
                                             model.createTicket();
-                                            // Navigator.pushAndRemoveUntil(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //       builder: (context) =>
-                                            //           const DashboardPage()),
-                                            //   (Route<dynamic> route) => false,
-                                            // );
                                             Navigator.pop(context);
+                                            _modelDashboard.getTicketBox();
                                           },
                                           child: const Text('TẠO VÀ IN VÉ')),
                                     )

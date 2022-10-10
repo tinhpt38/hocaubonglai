@@ -17,7 +17,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    initData();
+  }
+
+  initData() async {
     Authentication.initializeFirebase();
+    await _authModel.getUser();
   }
 
   @override
@@ -36,12 +41,21 @@ class _LoginPageState extends State<LoginPage> {
             });
             return SafeArea(
                 child: Scaffold(
-              body: Center(
-                child: ElevatedButton(
-                    onPressed: () async {
-                      await _authModel.signInWithGoogle(context);
-                    },
-                    child: const Text('Sign in with Google')),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                      'https://iweb.tatthanh.com.vn/pic/3/blog/images/image(2088).png'),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        await _authModel.signInWithGoogle(context);
+                      },
+                      child: const Text('Đăng nhập')),
+                ],
               ),
             ));
           })),

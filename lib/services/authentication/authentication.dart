@@ -11,9 +11,14 @@ class Authentication {
     return firebaseApp;
   }
 
+  // void logout() async {
+  //   final GoogleSignIn googleSignIn = GoogleSignIn();
+  //   await googleSignIn.disconnect();
+  // }
+
   static Future<User?> signInWithGoogle({required BuildContext context}) async {
     Firebase.initializeApp();
-    FirebaseAuth auth =  FirebaseAuth.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
 
     if (kIsWeb) {
