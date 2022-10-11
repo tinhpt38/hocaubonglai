@@ -46,7 +46,9 @@ class _LoginPageState extends State<LoginPage> {
                                   ? RemoteConfigs(
                                       remoteConfig: snapshot.requireData,
                                     )
-                                  : Container();
+                                  : const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
                             })),
                     (route) => false);
               }
