@@ -59,7 +59,7 @@ dependencies:
   excel: ^2.0.0-null-safety-3
   filesystem_picker: ^3.1.0
   permission_handler: ^10.1.0
-  
+  firebase_remote_config: ^2.0.20
 
 
 dev_dependencies:

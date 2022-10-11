@@ -40,12 +40,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Hồ Câu Bồng Lai',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const LoginPage(),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Hồ Câu Bồng Lai',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const LoginPage());
   }
 }
+

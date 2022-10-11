@@ -12,8 +12,6 @@ class AuthModel extends ChangeNotifier {
 
   UserRepository userRepository = UserRepository();
 
-  final DashboardModel _dashboardModel = DashboardModel();
-
   List<Users> _retrievedUsers = [];
   List<Users> get retrievedUsers => _retrievedUsers;
 

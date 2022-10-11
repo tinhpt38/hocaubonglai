@@ -1,6 +1,8 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/home/home.page.dart';
+import 'package:print_ticket/modules/remote_config/remote_config.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +37,17 @@ class _LoginPageState extends State<LoginPage> {
               if (_authModel.user != null) {
                 Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (_) => const HomePage()),
+                    MaterialPageRoute(
+                        builder: (_) => FutureBuilder<FirebaseRemoteConfig>(
+                            future: setupRemoteConfig(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<FirebaseRemoteConfig> snapshot) {
+                              return snapshot.hasData
+                                  ? RemoteConfigs(
+                                      remoteConfig: snapshot.requireData,
+                                    )
+                                  : Container();
+                            })),
                     (route) => false);
               }
             });
