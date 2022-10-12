@@ -58,7 +58,6 @@ class RemoteConfigs extends AnimatedWidget {
 Future<FirebaseRemoteConfig> setupRemoteConfig() async {
   final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
   await remoteConfig.fetchAndActivate();
-  print(remoteConfig.getBool('pay_for_admin'));
   RemoteConfigValue(null, ValueSource.valueStatic);
   await remoteConfig.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(seconds: 1),

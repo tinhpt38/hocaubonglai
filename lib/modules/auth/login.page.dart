@@ -1,7 +1,6 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
-import 'package:print_ticket/modules/home/home.page.dart';
 import 'package:print_ticket/modules/remote_config/remote_config.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 import 'package:provider/provider.dart';
@@ -46,8 +45,10 @@ class _LoginPageState extends State<LoginPage> {
                                   ? RemoteConfigs(
                                       remoteConfig: snapshot.requireData,
                                     )
-                                  : const Center(
-                                      child: CircularProgressIndicator(),
+                                  : const Scaffold(
+                                      body: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
                                     );
                             })),
                     (route) => false);
@@ -55,21 +56,23 @@ class _LoginPageState extends State<LoginPage> {
             });
             return SafeArea(
                 child: Scaffold(
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(
-                      'https://iweb.tatthanh.com.vn/pic/3/blog/images/image(2088).png'),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  ElevatedButton(
-                      onPressed: () async {
-                        await _authModel.signInWithGoogle(context);
-                      },
-                      child: const Text('Đăng nhập')),
-                ],
+              body: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.network(
+                        'https://iweb.tatthanh.com.vn/pic/3/blog/images/image(2088).png'),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          await _authModel.signInWithGoogle(context);
+                        },
+                        child: const Text('Đăng nhập')),
+                  ],
+                ),
               ),
             ));
           })),

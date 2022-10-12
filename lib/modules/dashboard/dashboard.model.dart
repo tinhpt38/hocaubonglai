@@ -5,15 +5,12 @@ import 'package:blue_print_pos/models/blue_device.dart';
 import 'package:blue_print_pos/models/connection_status.dart';
 import 'package:excel/excel.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:print_ticket/services/repositories/user_repository.dart';
 
 import '../../models/tickets.dart';
-import '../../models/users.dart';
 import '../../services/repositories/ticket_repository.dart';
 
 class DashboardModel extends ChangeNotifier {
@@ -38,6 +35,9 @@ class DashboardModel extends ChangeNotifier {
   List<Tickets> _retrievedTickets = [];
   List<Tickets> get retrievedTickets => _retrievedTickets;
 
+  List<Tickets> _getAllTicket = [];
+  List<Tickets> get getAllTicket => _getAllTicket;
+
   Future<List<Tickets>>? _ticketsList;
   Future<List<Tickets>>? get ticketsList => _ticketsList;
   List _listPrice = [];
@@ -45,21 +45,25 @@ class DashboardModel extends ChangeNotifier {
   getTicketBox() async {
     setIsLoading(true);
     _listPrice = [];
-    _retrievedTickets = await _ticketRepo.retrieveTicket();
-    _ticketsList = _ticketRepo.retrieveTicket();
+    _retrievedTickets =
+        await _ticketRepo.retrieveTicket(getCurrentDate.toString());
+    _ticketsList = _ticketRepo.retrieveTicket(getCurrentDate.toString());
+
+    _getAllTicket = await _ticketRepo.retrieveAllTicket();
+
+    // print(_retrievedTickets[0].timeIn.toString().substring(6, 16));
     for (var i = 0; i < _retrievedTickets.length; i++) {
       _listPrice.add(double.tryParse(_retrievedTickets[i].price.toString())!);
     }
     setIsLoading(false);
-    getTotalToday();
+    getPriceToday();
     notifyListeners();
   }
 
-  getTotalToday() {
+  getPriceToday() {
     if (_listPrice.isNotEmpty) {
       _totalPrice = _listPrice.reduce((value, element) => value + element);
     }
-
     notifyListeners();
   }
 
@@ -147,7 +151,7 @@ class DashboardModel extends ChangeNotifier {
     _rootPath = Directory('/storage/emulated/0/');
   }
 
-  Future<void> pickDir(BuildContext context) async {
+  Future<void> exportExcel(BuildContext context) async {
     final now = DateTime.now();
     String? path = await FilesystemPicker.open(
       title: 'Select folder',
@@ -177,7 +181,7 @@ class DashboardModel extends ChangeNotifier {
     ];
     sheetObject.insertRowIterables(header, 1);
     int stt = 1;
-    for (var element in _retrievedTickets) {
+    for (var element in _getAllTicket) {
       List<dynamic> row = [
         stt++,
         element.customer,
@@ -198,15 +202,17 @@ class DashboardModel extends ChangeNotifier {
           excelFile.createSync();
         }
         excelFile.writeAsBytesSync(excel.encode()!);
+        const snackBar = SnackBar(
+          content: Text('Đã xuất file!'),
+        );
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } catch (e) {
         print(e);
       }
     }
-    const snackBar = SnackBar(
-      content: Text('Đã xuất file!'),
-    );
 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
     notifyListeners();
   }
 

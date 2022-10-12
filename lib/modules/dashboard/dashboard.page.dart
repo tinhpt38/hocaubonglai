@@ -130,7 +130,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       onTap: () {
                         Navigator.pop(context);
                         (model.rootPath != null)
-                            ? model.pickDir(context)
+                            ? model.exportExcel(context)
                             : null;
                       },
                     ),
