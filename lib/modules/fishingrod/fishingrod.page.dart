@@ -98,7 +98,7 @@ class _FishingrodPageState extends State<FishingrodPage> {
                                               const SizedBox(
                                                 height: 5,
                                               ),
-                                              Text('${fishingRods.price} VNĐ',
+                                              Text('${fishingRods.price} K',
                                                   style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:

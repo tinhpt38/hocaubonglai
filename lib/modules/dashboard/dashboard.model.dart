@@ -3,6 +3,9 @@ import 'dart:io' as io;
 import 'package:blue_print_pos/blue_print_pos.dart';
 import 'package:blue_print_pos/models/blue_device.dart';
 import 'package:blue_print_pos/models/connection_status.dart';
+import 'package:blue_print_pos/receipt/receipt.dart';
+import 'package:blue_print_pos/receipt/receipt_section_text.dart';
+import 'package:blue_print_pos/receipt/receipt_text_size_type.dart';
 import 'package:excel/excel.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -220,102 +223,108 @@ class DashboardModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> onPrintReceipt(Ticket ticket) async {
-  //   setIsPrinting(true);
+  DateTime convertStringToDateTime(String date){
+    var inputFormat = DateFormat('HH:mm dd/MM/yyyy');
+    var value = inputFormat.parse(date);
+    return value;
+  }
 
-  //   /// Example for Print Text
-  //   final ReceiptSectionText receiptText = ReceiptSectionText();
-  //   // receiptText.addSpacer();
-  //   receiptText.addText(
-  //     'VÉ CÂU HỒ BỒNG LAI',
-  //     size: ReceiptTextSizeType.extraLarge,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addText(DateFormat('dd/MM/yyyy').format(ticket.timeIn!),
-  //       size: ReceiptTextSizeType.extraLarge, style: ReceiptTextStyleType.bold);
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Giờ vào',
-  //     DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeIn!),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Giờ ra',
-  //     DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeOut!),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Vị trí',
-  //     ticket.seats ?? '',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Loại cần',
-  //     ticket.fishingrod?.name ?? '',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Số cần',
-  //     ticket.fishingrodQuantity.toString(),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'GIÁ',
-  //     '${ticket.price.toString()} K',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addText(
-  //     'LƯU Ý:',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.normal,
-  //   );
-  //   receiptText.addText(
-  //     'Cần thủ giữ  vé trong suốt ca câu',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addText(
-  //     'Liên hệ: Mr Thanh - 0868211119',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   // receiptText.addSpacer(count: 2);`
+  Future<void> onPrintReceipt(Tickets ticket) async {
+    setIsPrinting(true);
 
-  //   await _bluePrintPos.printReceiptText(receiptText);
-  //   setIsPrinting(false);
+    /// Example for Print Text
+    final ReceiptSectionText receiptText = ReceiptSectionText();
+    // receiptText.addSpacer();
+    receiptText.addText(
+      'VÉ CÂU HỒ BỒNG LAI',
+      size: ReceiptTextSizeType.extraLarge,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(DateFormat('dd/MM/yyyy').format(convertStringToDateTime(ticket.timeIn!)),
+        size: ReceiptTextSizeType.extraLarge, style: ReceiptTextStyleType.bold);
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Giờ vào',
+      DateFormat('HH:mm dd/MM/yyyy').format(convertStringToDateTime(ticket.timeIn!)),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Giờ ra',
+      DateFormat('HH:mm dd/MM/yyyy').format(convertStringToDateTime(ticket.timeOut!)),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Vị trí',
+      ticket.seats ?? '',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Loại cần',
+      ticket.fishingrod ?? '',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Số cần',
+      ticket.fishingrodQuantity.toString(),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'GIÁ',
+      '${ticket.price.toString()} K',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.extraLarge,
+      rightSize: ReceiptTextSizeType.extraLarge,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addText(
+      'LƯU Ý:',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.normal,
+    );
+    receiptText.addText(
+      'Cần thủ giữ  vé trong suốt ca câu',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(
+      'Liên hệ: Mr Thanh - 0868211119',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    // receiptText.addSpacer(count: 2);`
 
-  //   // /// Example for print QR
-  //   // await _bluePrintPos.printQR('https://www.google.com/', size: 250);
+    await _bluePrintPos.printReceiptText(receiptText);
+    setIsPrinting(false);
 
-  //   /// Text after QR
-  //   // final ReceiptSectionText receiptSecondText = ReceiptSectionText();
-  //   // receiptSecondText.addText('Powered by Google',
-  //   //     size: ReceiptTextSizeType.small);
-  //   // receiptSecondText.addSpacer();
-  //   // await _bluePrintPos.printReceiptText(receiptSecondText, feedCount: 1);
-  // }
+    // /// Example for print QR
+    // await _bluePrintPos.printQR('https://www.google.com/', size: 250);
+
+    /// Text after QR
+    // final ReceiptSectionText receiptSecondText = ReceiptSectionText();
+    // receiptSecondText.addText('Powered by Google',
+    //     size: ReceiptTextSizeType.small);
+    // receiptSecondText.addSpacer();
+    // await _bluePrintPos.printReceiptText(receiptSecondText, feedCount: 1);
+  }
 }

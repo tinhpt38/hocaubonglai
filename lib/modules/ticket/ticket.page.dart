@@ -248,7 +248,7 @@ class _TicketPageState extends State<TicketPage> {
                                             Navigator.pop(context);
                                             _modelDashboard.getTicketBox();
                                           },
-                                          child: const Text('TẠO VÀ IN VÉ')),
+                                          child: const Text('TẠO VÉ')),
                                     )
                                   ],
                                 ),

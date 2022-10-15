@@ -11,6 +11,7 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import '../../models/tickets.dart';
+import '../configuation/demo.print.dart';
 import '../ticket/ticket.page.dart';
 import 'view/ticket.item.view.dart';
 
@@ -115,6 +116,10 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) =>  const DemoPrintPage(title: 'Tìm kiếm máy in')
+                        ));
+ 
                       },
                     ),
                     ListTile(
@@ -215,8 +220,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                         onPrintClick: () async {
                                           // await model
                                           //     .onPrint(model.tickets[index]);
-                                          // await _model.onPrintReceipt(
-                                          //     model.tickets[index]);
+                                          await _model.onPrintReceipt(
+                                              model.retrievedTickets[index]);
                                         },
                                         isAdmin: _modelHome.role,
                                       );
