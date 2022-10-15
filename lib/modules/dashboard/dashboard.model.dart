@@ -40,6 +40,9 @@ class DashboardModel extends ChangeNotifier {
 
   Future<List<Tickets>>? _ticketsList;
   Future<List<Tickets>>? get ticketsList => _ticketsList;
+
+  Future<List<Tickets>>? _ticketsList1;
+  Future<List<Tickets>>? get ticketsList1 => _ticketsList1;
   List _listPrice = [];
 
   getTicketBox() async {
@@ -49,7 +52,7 @@ class DashboardModel extends ChangeNotifier {
         await _ticketRepo.retrieveTicket(getCurrentDate.toString());
     _ticketsList = _ticketRepo.retrieveTicket(getCurrentDate.toString());
 
-    _getAllTicket = await _ticketRepo.retrieveAllTicket();
+    // _getAllTicket = await _ticketRepo.retrieveAllTicket();
 
     // print(_retrievedTickets[0].timeIn.toString().substring(6, 16));
     for (var i = 0; i < _retrievedTickets.length; i++) {
@@ -151,7 +154,8 @@ class DashboardModel extends ChangeNotifier {
     _rootPath = Directory('/storage/emulated/0/');
   }
 
-  Future<void> exportExcel(BuildContext context) async {
+  Future<void> exportExcel(BuildContext context, String time, bool day) async {
+    _getAllTicket = await _ticketRepo.retrieveAllTicket(time);
     final now = DateTime.now();
     String? path = await FilesystemPicker.open(
       title: 'Select folder',
@@ -181,7 +185,7 @@ class DashboardModel extends ChangeNotifier {
     ];
     sheetObject.insertRowIterables(header, 1);
     int stt = 1;
-    for (var element in _getAllTicket) {
+    for (var element in (day == true ? _retrievedTickets : _getAllTicket)) {
       List<dynamic> row = [
         stt++,
         element.customer,

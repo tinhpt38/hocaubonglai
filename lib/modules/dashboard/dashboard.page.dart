@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/auth/login.page.dart';
@@ -128,10 +129,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                       onTap: () {
-                        Navigator.pop(context);
-                        (model.rootPath != null)
-                            ? model.exportExcel(context)
-                            : null;
+                        _dialogExcel(context, model);
                       },
                     ),
                     _modelHome.role == true
@@ -238,6 +236,113 @@ class _DashboardPageState extends State<DashboardPage> {
           );
         },
       ),
+    );
+  }
+
+  Future<void> _dialogExcel(BuildContext context, var model) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Center(child: Text('Xuất Excel')),
+          content: const Text('Chọn xuất hôm nay hoặc chọn tháng'),
+          actions: <Widget>[
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  textStyle: Theme.of(context).textTheme.labelLarge,
+                ),
+                child: const Text('Xuất hôm nay'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  (model.rootPath != null)
+                      ? model.exportExcel(context, '', true)
+                      : null;
+                },
+              ),
+            ),
+            ExportExcel(
+              model: model,
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class ExportExcel extends StatefulWidget {
+  final DashboardModel model;
+  const ExportExcel({super.key, required this.model});
+
+  @override
+  State<ExportExcel> createState() => _ExportExcelState();
+}
+
+class _ExportExcelState extends State<ExportExcel> {
+  List list = [
+    '01',
+    '02',
+    '03',
+    '04',
+    '05',
+    '06',
+    '07',
+    '08',
+    '09',
+    '10',
+    '11',
+    '12'
+  ];
+  String dropdownValue = '01';
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextButton(
+          style: TextButton.styleFrom(
+            textStyle: Theme.of(context).textTheme.labelLarge,
+          ),
+          child: const Text('Xuất tháng'),
+          onPressed: () {
+            Navigator.pop(context);
+            (widget.model.rootPath != null)
+                ? widget.model.exportExcel(context, dropdownValue, false)
+                : null;
+          },
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Chọn tháng: '),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton2(
+                  hint: const Text(''),
+                  isExpanded: false,
+                  items: list
+                      .map((item) => DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              '  $item  ',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ))
+                      .toList(),
+                  value: dropdownValue,
+                  onChanged: (String? value) {
+                    setState(() {
+                      dropdownValue = value!;
+                    });
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

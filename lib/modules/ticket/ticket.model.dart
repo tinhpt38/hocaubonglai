@@ -164,7 +164,8 @@ class TicketModel extends ChangeNotifier {
       'seats': _seatsController.text,
       'timeIn': _timeIn,
       'timeOut': _timeOut,
-      'createAt': getCurrentDate.toString()
+      'createAt': getCurrentDate,
+      'createAtMonth': getCurrentDate.substring(3, 5)
     }));
     if (phoneCustomers.contains(phoneController.text)) {
     } else {
