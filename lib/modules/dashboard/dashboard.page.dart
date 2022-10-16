@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
@@ -65,11 +66,12 @@ class _DashboardPageState extends State<DashboardPage> {
                   _modelHome.role == true
                       ? ElevatedButton.icon(
                           icon: const Icon(Icons.add),
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const TicketPage()));
+                            model.getTicketBox();
                           },
                           label: const Text('Thêm'),
                         )
@@ -117,10 +119,11 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       onTap: () {
                         Navigator.pop(context);
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) =>  const DemoPrintPage(title: 'Tìm kiếm máy in')
-                        ));
- 
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DemoPrintPage(
+                                    title: 'Tìm kiếm máy in')));
                       },
                     ),
                     ListTile(
@@ -249,27 +252,44 @@ class _DashboardPageState extends State<DashboardPage> {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
+        String? month;
         return AlertDialog(
           title: const Center(child: Text('Xuất Excel')),
           content: const Text('Chọn xuất hôm nay hoặc chọn tháng'),
           actions: <Widget>[
-            Center(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  textStyle: Theme.of(context).textTheme.labelLarge,
-                ),
-                child: const Text('Xuất hôm nay'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  (model.rootPath != null)
-                      ? model.exportExcel(context, '', true)
-                      : null;
-                },
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
               ),
+              child: const Text('Xuất hôm nay'),
+              onPressed: () {
+                Navigator.pop(context);
+                (model.rootPath != null)
+                    ? model.exportExcel(context, '', true)
+                    : null;
+              },
             ),
-            ExportExcel(
-              model: model,
-            ),
+            TextButton(
+                onPressed: ()  {
+                   DatePicker.showPicker(context, onConfirm: (time) {
+                    setState(() {
+                      month = '${time.month}/${time.year}';
+                      (model.rootPath != null)
+                          ? model.exportExcel(context, month, false)
+                          : null;
+
+                      // ignore: use_build_context_synchronously
+                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    });
+                   
+                  },
+                      pickerModel: CustomMonthPicker(
+                          minTime: DateTime(2022, 9, 1),
+                          maxTime: DateTime.now(),
+                          currentTime: DateTime.now(),
+                          locale: LocaleType.vi));
+                },
+                child: const Text('Xuất tháng'))
           ],
         );
       },
@@ -277,78 +297,20 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-class ExportExcel extends StatefulWidget {
-  final DashboardModel model;
-  const ExportExcel({super.key, required this.model});
+class CustomMonthPicker extends DatePickerModel {
+  CustomMonthPicker(
+      {required DateTime currentTime,
+      required DateTime minTime,
+      required DateTime maxTime,
+      required LocaleType locale})
+      : super(
+            locale: locale,
+            minTime: minTime,
+            maxTime: maxTime,
+            currentTime: currentTime);
 
   @override
-  State<ExportExcel> createState() => _ExportExcelState();
-}
-
-class _ExportExcelState extends State<ExportExcel> {
-  List list = [
-    '01',
-    '02',
-    '03',
-    '04',
-    '05',
-    '06',
-    '07',
-    '08',
-    '09',
-    '10',
-    '11',
-    '12'
-  ];
-  String dropdownValue = '01';
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: Theme.of(context).textTheme.labelLarge,
-          ),
-          child: const Text('Xuất tháng'),
-          onPressed: () {
-            Navigator.pop(context);
-            (widget.model.rootPath != null)
-                ? widget.model.exportExcel(context, dropdownValue, false)
-                : null;
-          },
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Chọn tháng: '),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton2(
-                  hint: const Text(''),
-                  isExpanded: false,
-                  items: list
-                      .map((item) => DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              '  $item  ',
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ))
-                      .toList(),
-                  value: dropdownValue,
-                  onChanged: (String? value) {
-                    setState(() {
-                      dropdownValue = value!;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+  List<int> layoutProportions() {
+    return [1, 1, 0];
   }
 }

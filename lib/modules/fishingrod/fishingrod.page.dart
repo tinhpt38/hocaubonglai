@@ -65,115 +65,119 @@ class _FishingrodPageState extends State<FishingrodPage> {
                               itemBuilder: (context, index) {
                                 final FishingRods fishingRods =
                                     model.retrievedFishinGrods[index];
-                                return SizedBox(
-                                  height: 130,
-                                  child: Card(
-                                    margin: const EdgeInsets.all(10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: ListTile(
-                                          title: Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 5),
-                                            child: Text(
-                                              fishingRods.name.toString(),
-                                              style: const TextStyle(
-                                                  fontSize: 22,
-                                                  fontWeight: FontWeight.bold),
+                                return Card(
+                                  margin: const EdgeInsets.all(10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: ListTile(
+                                        title: Padding(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 5),
+                                          child: Text(
+                                            fishingRods.name.toString(),
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        subtitle: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(fishingRods.codeRod.toString(),
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            const SizedBox(
+                                              height: 5,
                                             ),
-                                          ),
-                                          subtitle: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  fishingRods.codeRod
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text('${fishingRods.price} K',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold))
-                                            ],
-                                          ),
-                                          trailing: SizedBox(
-                                              width: 100,
-                                              child: _modelHome.role == true
-                                                  ? Row(
-                                                      children: [
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              show(
-                                                                  model,
-                                                                  false,
-                                                                  fishingRods.id
-                                                                      .toString());
-                                                            },
-                                                            icon: const Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.green,
-                                                            )),
-                                                        IconButton(
-                                                            onPressed: () {
-                                                              showDialog(
-                                                                  context:
+                                            Text('${fishingRods.price} K',
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight:
+                                                        FontWeight.bold))
+                                          ],
+                                        ),
+                                        trailing: SizedBox(
+                                            width: 100,
+                                            child: _modelHome.role == true
+                                                ? Row(
+                                                    children: [
+                                                      IconButton(
+                                                          onPressed: () async {
+                                                            await model.setData(
+                                                                fishingRods
+                                                                    .codeRod
+                                                                    .toString(),
+                                                                fishingRods.name
+                                                                    .toString(),
+                                                                fishingRods
+                                                                    .price
+                                                                    .toString());
+                                                            show(
+                                                                model,
+                                                                false,
+                                                                fishingRods.id
+                                                                    .toString());
+                                                          },
+                                                          icon: const Icon(
+                                                            Icons.edit,
+                                                            color: Colors.green,
+                                                          )),
+                                                      IconButton(
+                                                          onPressed: () {
+                                                            showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (
+                                                                  BuildContext
                                                                       context,
-                                                                  builder: (
-                                                                    BuildContext
-                                                                        context,
-                                                                  ) =>
-                                                                      AlertDialog(
-                                                                        title:
-                                                                            const Center(
+                                                                ) =>
+                                                                    AlertDialog(
+                                                                      title:
+                                                                          const Center(
+                                                                        child: Text(
+                                                                            'Xóa cần câu?'),
+                                                                      ),
+                                                                      content:
+                                                                          Text(
+                                                                        fishingRods
+                                                                            .name
+                                                                            .toString(),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <
+                                                                          Widget>[
+                                                                        TextButton(
+                                                                          onPressed: () => Navigator.pop(
+                                                                              context,
+                                                                              'Không'),
                                                                           child:
-                                                                              Text('Xóa cần câu?'),
+                                                                              const Text('Không'),
                                                                         ),
-                                                                        content:
-                                                                            Text(
-                                                                          fishingRods
-                                                                              .name
-                                                                              .toString(),
-                                                                          textAlign:
-                                                                              TextAlign.center,
+                                                                        TextButton(
+                                                                          onPressed:
+                                                                              () {
+                                                                            model.deleteFishingRod(fishingRods.id.toString());
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child:
+                                                                              const Text('Xóa'),
                                                                         ),
-                                                                        actions: <
-                                                                            Widget>[
-                                                                          TextButton(
-                                                                            onPressed: () =>
-                                                                                Navigator.pop(context, 'Không'),
-                                                                            child:
-                                                                                const Text('Không'),
-                                                                          ),
-                                                                          TextButton(
-                                                                            onPressed:
-                                                                                () {
-                                                                              model.deleteFishingRod(fishingRods.id.toString());
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child:
-                                                                                const Text('Xóa'),
-                                                                          ),
-                                                                        ],
-                                                                      ));
-                                                            },
-                                                            icon: const Icon(
-                                                                Icons.delete,
-                                                                color: Colors
-                                                                    .red)),
-                                                      ],
-                                                    )
-                                                  : Container())),
-                                    ),
+                                                                      ],
+                                                                    ));
+                                                          },
+                                                          icon: const Icon(
+                                                              Icons.delete,
+                                                              color:
+                                                                  Colors.red)),
+                                                    ],
+                                                  )
+                                                : Container())),
                                   ),
                                 );
                               },

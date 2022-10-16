@@ -74,6 +74,10 @@ class TicketItemView extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
+              child: Text('Số ca: ${ticket.count}'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Text('Giờ vào: ${ticket.timeIn}'),
             ),
             Padding(
