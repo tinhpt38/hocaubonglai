@@ -6,12 +6,14 @@ import 'package:blue_print_pos/models/connection_status.dart';
 import 'package:blue_print_pos/receipt/receipt.dart';
 import 'package:blue_print_pos/receipt/receipt_section_text.dart';
 import 'package:blue_print_pos/receipt/receipt_text_size_type.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 import 'package:excel/excel.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/tickets.dart';
 import '../../services/repositories/ticket_repository.dart';
@@ -149,6 +151,37 @@ class DashboardModel extends ChangeNotifier {
     });
   }
 
+  connectDevice() async {
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
+    String? value = _prefs.getString('selectedDevice');
+    if (value == null) {
+      await onScanPressed();
+    } else {
+      final BlueDevice blueDevice = parseStringToBlueDevice(value);
+      _bluePrintPos.connect(blueDevice).then((ConnectionStatus status) {
+        if (status == ConnectionStatus.connected) {
+          _selectedDevice = blueDevice;
+          notifyListeners();
+        } else if (status == ConnectionStatus.timeout) {
+          _onDisconnectDevice();
+        } else {
+          if (kDebugMode) {
+            print('$runtimeType - something wrong');
+          }
+        }
+        // setState(() => _isLoading = false);
+      });
+    }
+  }
+
+  BlueDevice parseStringToBlueDevice(String deviceString) {
+//  return 'address/ ${device.address} - name/ ${device.name} - type/ ${device.type}';
+    List<String> temp = deviceString.split('-');
+    String address = temp[0].split("/")[1].trim();
+    String name = temp[1].split("/")[1].trim();
+    return BlueDevice(name: name, address: address);
+  }
+
   Directory? _rootPath;
   Directory? get rootPath => _rootPath;
   String? dirPath;
@@ -223,7 +256,7 @@ class DashboardModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  DateTime convertStringToDateTime(String date){
+  DateTime convertStringToDateTime(String date) {
     var inputFormat = DateFormat('HH:mm dd/MM/yyyy');
     var value = inputFormat.parse(date);
     return value;
@@ -240,12 +273,16 @@ class DashboardModel extends ChangeNotifier {
       size: ReceiptTextSizeType.extraLarge,
       style: ReceiptTextStyleType.bold,
     );
-    receiptText.addText(DateFormat('dd/MM/yyyy').format(convertStringToDateTime(ticket.timeIn!)),
-        size: ReceiptTextSizeType.extraLarge, style: ReceiptTextStyleType.bold);
+    receiptText.addText(
+        DateFormat('dd/MM/yyyy')
+            .format(convertStringToDateTime(ticket.timeIn!)),
+        size: ReceiptTextSizeType.extraLarge,
+        style: ReceiptTextStyleType.bold);
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Giờ vào',
-      DateFormat('HH:mm dd/MM/yyyy').format(convertStringToDateTime(ticket.timeIn!)),
+      DateFormat('HH:mm dd/MM/yyyy')
+          .format(convertStringToDateTime(ticket.timeIn!)),
       leftStyle: ReceiptTextStyleType.normal,
       leftSize: ReceiptTextSizeType.extraLarge,
       rightSize: ReceiptTextSizeType.extraLarge,
@@ -254,7 +291,8 @@ class DashboardModel extends ChangeNotifier {
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Giờ ra',
-      DateFormat('HH:mm dd/MM/yyyy').format(convertStringToDateTime(ticket.timeOut!)),
+      DateFormat('HH:mm dd/MM/yyyy')
+          .format(convertStringToDateTime(ticket.timeOut!)),
       leftStyle: ReceiptTextStyleType.normal,
       leftSize: ReceiptTextSizeType.extraLarge,
       rightSize: ReceiptTextSizeType.extraLarge,
@@ -314,7 +352,8 @@ class DashboardModel extends ChangeNotifier {
     );
     // receiptText.addSpacer(count: 2);`
 
-    await _bluePrintPos.printReceiptText(receiptText);
+    await _bluePrintPos.printReceiptText(receiptText, 
+    paperSize: PaperSize.mm72);
     setIsPrinting(false);
 
     // /// Example for print QR

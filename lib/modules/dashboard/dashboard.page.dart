@@ -36,6 +36,7 @@ class _DashboardPageState extends State<DashboardPage> {
     await _modelHome.getUser();
     await _model.getTicketBox();
     // _model.onScanPressed();
+    await _model.connectDevice();
     await _model.prepareStorage();
   }
 

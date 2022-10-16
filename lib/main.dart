@@ -5,6 +5,7 @@ import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/customer/customer.model.dart';
 import 'package:print_ticket/modules/permission/permission.model.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
+// import 'package:print_ticket/services/hive/hive.service.dart';
 import 'package:provider/provider.dart';
 import 'modules/dashboard/dashboard.model.dart';
 import 'services/authentication/authentication.dart';
@@ -13,6 +14,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await Authentication.initializeFirebase();
+  // await HiveService().initBoxCollection();
+  // await HiveService().openBlueDeviceBox();
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(

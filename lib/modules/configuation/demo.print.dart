@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as RB;
+import 'package:print_ticket/services/hive/hive.service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DemoPrintPage extends StatefulWidget {
   const DemoPrintPage({Key? key, required this.title}) : super(key: key);
@@ -39,6 +41,7 @@ class _DemoPrintPageState extends State<DemoPrintPage> {
   BlueDevice? _selectedDevice;
   bool _isLoading = false;
   int _loadingAtIndex = -1;
+  HiveService hiveService = HiveService();
 
   // BLE weighing
   final flutterReactiveBle = RB.FlutterReactiveBle();
@@ -93,27 +96,24 @@ class _DemoPrintPageState extends State<DemoPrintPage> {
     });
   }
 
-  Map<String, dynamic> blueDeviceToString(BlueDevice device) {
-    return {
-      'address': device.address,
-      'name': device.name,
-      'connected': device.connected,
-      'type': device.type,
-    };
+  String blueDeviceToString(BlueDevice device) {
+    return 'address/ ${device.address} - name/ ${device.name} - type/ ${device.type}';
   }
 
-  void _onSelectDevice(int index) {
+  void _onSelectDevice(int index) async {
     setState(() {
       _isLoading = true;
       _loadingAtIndex = index;
     });
+    final SharedPreferences _prefs = await SharedPreferences.getInstance();
 
     final BlueDevice blueDevice = _blueDevices[index];
 
     _bluePrintPos.connect(blueDevice).then((ConnectionStatus status) {
       if (status == ConnectionStatus.connected) {
-        blueDeviceToString(blueDevice);
-        
+        String deviceString = blueDeviceToString(blueDevice);
+        _prefs.setString('selectedDevice', deviceString);
+
         setState(() => _selectedDevice = blueDevice);
       } else if (status == ConnectionStatus.timeout) {
         _onDisconnectDevice();

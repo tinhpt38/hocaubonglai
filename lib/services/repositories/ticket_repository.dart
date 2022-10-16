@@ -22,6 +22,7 @@ class TicketRepository {
           price: doc['price'].toDouble(),
           fishingrod: doc['fishingRod'].toString(),
           phone: doc['phone'].toString(),
+          count: doc['count'].toInt(),
         ));
       }
     });
@@ -46,6 +47,7 @@ class TicketRepository {
           price: doc['price'].toDouble(),
           fishingrod: doc['fishingRod'].toString(),
           phone: doc['phone'].toString(),
+          count: doc['count'].toInt(),
         ));
       }
     });
