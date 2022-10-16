@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:print_ticket/modules/home/home.page.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 import 'package:provider/provider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
-import '../dashboard/dashboard.model.dart';
+
 
 class TicketPage extends StatefulWidget {
   const TicketPage({super.key});
@@ -26,8 +27,6 @@ class _TicketPageState extends State<TicketPage> {
     await _model.getCustomer();
     await _model.getFishingRod();
   }
-
-  final DashboardModel _dashboardModel = DashboardModel();
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +231,7 @@ class _TicketPageState extends State<TicketPage> {
                                           border: Border.all(
                                               color: Colors.black87, width: 1)),
                                       child: Text(
-                                        'Giá vé: ${model.total} VNĐ',
+                                        'Giá vé: ${model.total} K',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                             fontSize: 24,
@@ -246,16 +245,9 @@ class _TicketPageState extends State<TicketPage> {
                                       child: ElevatedButton(
                                           onPressed: () async {
                                             model.createTicket();
-                                            // Navigator.pushAndRemoveUntil(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //       builder: (context) =>
-                                            //           const DashboardPage()),
-                                            //   (Route<dynamic> route) => false,
-                                            // );
                                             Navigator.pop(context);
                                           },
-                                          child: const Text('TẠO VÀ IN VÉ')),
+                                          child: const Text('TẠO VÉ')),
                                     )
                                   ],
                                 ),
@@ -272,6 +264,15 @@ class _TicketPageState extends State<TicketPage> {
                   ),
                 ));
           })),
+    );
+  }
+
+  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+    // Navigator.push returns a Future that completes after calling
+    // Navigator.pop on the Selection Screen.
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
     );
   }
 }

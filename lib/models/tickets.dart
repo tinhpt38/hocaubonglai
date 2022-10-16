@@ -8,6 +8,7 @@ class Tickets {
   double? price;
   String? customer;
   String? phone;
+  int? count;
   Tickets(
       {this.id,
       this.timeIn,
@@ -17,5 +18,6 @@ class Tickets {
       this.fishingrodQuantity,
       this.price,
       this.customer,
+      this.count,
       this.phone});
 }

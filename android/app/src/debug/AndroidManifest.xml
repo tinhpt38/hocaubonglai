@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 <!-- Provide required visibility configuration for API level 30 and above -->
 <queries>
   <!-- If your app checks for SMS support -->
@@ -19,8 +20,8 @@
   </intent>
   <!-- If your app checks for call support -->
   <intent>
-    <action android:name="android.intent.action.VIEW" />
-    <data android:scheme="tel" />
+   <action android:name="android.intent.action.DIAL" />
+   <data android:scheme="tel" />
   </intent>
 </queries>
 </manifest>
