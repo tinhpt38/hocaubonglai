@@ -192,13 +192,14 @@ class DashboardModel extends ChangeNotifier {
 
   Future<void> exportExcel(BuildContext context, String time, bool day) async {
     _getAllTicket = await _ticketRepo.retrieveAllTicket(time);
+    bool exported = false;
     final now = DateTime.now();
     String? path = await FilesystemPicker.open(
-      title: 'Select folder',
+      title: 'Chọn nơi lưu',
       context: context,
       rootDirectory: _rootPath!,
       fsType: FilesystemType.folder,
-      pickText: 'Select this folder',
+      pickText: 'Chọn nơi lưu',
       folderIconColor: Colors.teal,
       requestPermission: () async =>
           await Permission.storage.request().isGranted,
@@ -216,6 +217,7 @@ class DashboardModel extends ChangeNotifier {
       'Vị trí',
       'Lọai cần',
       'Số cần',
+      'Số ca',
       'Giờ vào',
       'Giờ ra'
     ];
@@ -230,8 +232,9 @@ class DashboardModel extends ChangeNotifier {
         element.seats,
         element.fishingrod,
         element.fishingrodQuantity,
+        element.count,
         element.timeIn,
-        element.timeOut
+        element.timeOut,
       ];
       sheetObject.insertRowIterables(row, stt);
       final String fileName =
@@ -242,15 +245,20 @@ class DashboardModel extends ChangeNotifier {
           excelFile.createSync();
         }
         excelFile.writeAsBytesSync(excel.encode()!);
-        const snackBar = SnackBar(
-          content: Text('Đã xuất file!'),
-        );
-
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        exported = true;
       } catch (e) {
         print(e);
       }
+    }
+    const snackBar = SnackBar(
+      content: Text('Đã xuất file!'),
+    );
+
+    if (exported == true) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     notifyListeners();
@@ -352,8 +360,8 @@ class DashboardModel extends ChangeNotifier {
     );
     // receiptText.addSpacer(count: 2);`
 
-    await _bluePrintPos.printReceiptText(receiptText, 
-    paperSize: PaperSize.mm72);
+    await _bluePrintPos.printReceiptText(receiptText,
+        paperSize: PaperSize.mm72);
     setIsPrinting(false);
 
     // /// Example for print QR

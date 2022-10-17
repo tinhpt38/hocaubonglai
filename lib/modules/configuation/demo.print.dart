@@ -1,7 +1,6 @@
-import 'dart:convert';
+
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
+
 
 import 'package:blue_print_pos/blue_print_pos.dart';
 import 'package:blue_print_pos/models/blue_device.dart';
@@ -11,7 +10,6 @@ import 'package:blue_print_pos/receipt/receipt_text_size_type.dart';
 import 'package:blue_print_pos/receipt/receipt_text_style_type.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' as RB;
 import 'package:print_ticket/services/hive/hive.service.dart';
@@ -53,7 +51,7 @@ class _DemoPrintPageState extends State<DemoPrintPage> {
   @override
   void initState() {
     super.initState();
-    (WidgetsBinding.instance)?.addPostFrameCallback((_) async {});
+    (WidgetsBinding.instance).addPostFrameCallback((_) async {});
   }
 
   @override
