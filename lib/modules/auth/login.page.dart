@@ -72,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     ElevatedButton(
                         onPressed: () async {
+                          await _authModel.getUser();
                           await _authModel.signInWithGoogle(context);
                           
                           // await _modelHome.getUser();
