@@ -278,68 +278,78 @@ class DashboardModel extends ChangeNotifier {
     // receiptText.addSpacer();
     receiptText.addText(
       'VÉ CÂU HỒ BỒNG LAI',
-      size: ReceiptTextSizeType.extraLarge,
+      size: ReceiptTextSizeType.large,
       style: ReceiptTextStyleType.bold,
     );
     receiptText.addText(
         DateFormat('dd/MM/yyyy')
             .format(convertStringToDateTime(ticket.timeIn!)),
-        size: ReceiptTextSizeType.extraLarge,
+        size: ReceiptTextSizeType.large,
         style: ReceiptTextStyleType.bold);
     receiptText.addSpacer(useDashed: true);
-    receiptText.addLeftRightText(
-      'Giờ vào',
+    receiptText.addLeftRightText( 
+      'Giờ vào:',
       DateFormat('HH:mm dd/MM/yyyy')
           .format(convertStringToDateTime(ticket.timeIn!)),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
-      'Giờ ra',
+      'Giờ ra:',
       DateFormat('HH:mm dd/MM/yyyy')
           .format(convertStringToDateTime(ticket.timeOut!)),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
-      'Vị trí',
+      'Vị trí:',
       ticket.seats ?? '',
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
-      'Loại cần',
+      'Loại cần:',
       ticket.fishingrod ?? '',
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
-      'Số cần',
+      'Số cần:',
       ticket.fishingrodQuantity.toString(),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Số ca:',
+      ticket.count.toString(),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
-      'GIÁ',
+      'GIÁ:',
       '${ticket.price.toString()} K',
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.extraLarge,
-      rightSize: ReceiptTextSizeType.extraLarge,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
@@ -354,7 +364,12 @@ class DashboardModel extends ChangeNotifier {
       style: ReceiptTextStyleType.bold,
     );
     receiptText.addText(
-      'Liên hệ: Mr Thanh - 0868211119',
+      'Liên hệ: Mr Thanh',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(
+      '0868.211.119',
       size: ReceiptTextSizeType.large,
       style: ReceiptTextStyleType.bold,
     );
