@@ -38,7 +38,7 @@ void main() async {
     ChangeNotifierProvider(
       create: (context) => HomeModel(),
     ),
-  ], child: const RestarApp(child: MyApp())));
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

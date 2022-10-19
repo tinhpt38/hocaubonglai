@@ -11,13 +11,14 @@ class UserCap {
   late List<Users> _users;
 
   Future<bool> isAdmin() async {
+    // ignore: no_leading_underscores_for_local_identifiers
     final User? _userLogined = FirebaseAuth.instance.currentUser;
     if(_userLogined == null){
       return false;
     }
     _users = await userRepository.retrieveUser();
     Users compareUser =
-        _users.firstWhere((element) => element.email == _userLogined?.email);
+        _users.firstWhere((element) => element.email == _userLogined.email);
     return compareUser.role == "Admin";
 
     // String? selectedEmail = emailList.firstWhere((e) => e == value.email);
