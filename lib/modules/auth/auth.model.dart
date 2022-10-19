@@ -67,8 +67,8 @@ class AuthModel extends ChangeNotifier {
   }
 
   logout() async {
-    // final GoogleSignIn googleSignIn = GoogleSignIn();
-    // await googleSignIn.disconnect();
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    await googleSignIn.disconnect();
     await FirebaseAuth.instance.signOut();
 
   }
