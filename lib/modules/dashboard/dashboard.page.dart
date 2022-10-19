@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:print_ticket/core/widget/restart.app.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
@@ -33,10 +34,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   initData() async {
+    await _modelHome.getUser();
     await _model.getTicketBox();
     await _model.connectDevice();
     await _model.prepareStorage();
-    // await _modelHome.getUser();
   }
 
   @override
@@ -58,10 +59,10 @@ class _DashboardPageState extends State<DashboardPage> {
           return SafeArea(
             child: Scaffold(
               appBar: AppBar(
-                centerTitle: !_modelHome.role,
+                centerTitle: !_modelHome.isAdmin,
                 title: const Text('CÁC VÉ HÔM NAY'),
                 actions: [
-                  _modelHome.role == true
+                  _modelHome.isAdmin == true
                       ? ElevatedButton.icon(
                           icon: const Icon(Icons.add),
                           onPressed: () async {
@@ -92,7 +93,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                   _auth.userLogined?.photoURL.toString() ??
                                       "")),
                           title: Text(
-                            "${_auth.userLogined?.displayName.toString()} (${_modelHome.role == true ? "Admin" : "Nhân viên"})",
+                            "${_auth.userLogined?.displayName.toString()} (${_modelHome.isAdmin == true ? "Admin" : "Nhân viên"})",
                             style: const TextStyle(
                               color: Colors.black,
                             ),
@@ -124,7 +125,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                     title: 'Tìm kiếm máy in')));
                       },
                     ),
-                    _modelHome.role == true
+                    _modelHome.isAdmin == true
                         ? ListTile(
                             leading: const Icon(
                               Icons.import_export,
@@ -141,7 +142,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             },
                           )
                         : Container(),
-                    _modelHome.role == true
+                    _modelHome.isAdmin == true
                         ? ListTile(
                             leading: const Icon(
                               Icons.verified_user,
@@ -173,14 +174,14 @@ class _DashboardPageState extends State<DashboardPage> {
                           color: Colors.blue,
                         ),
                       ),
-                      onTap: () {
-                        _auth.logout();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                              maintainState: false),
-                        );
+                      onTap: () async {
+                        await _auth.logout();
+                        // RestarApp.restartApp(context);
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => const LoginPage())),
+                            (route) => true);
                       },
                     ),
                   ],
@@ -200,7 +201,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _modelHome.role == true
+                              _modelHome.isAdmin == true
                                   ? Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 12),
@@ -231,7 +232,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                           await _model.onPrintReceipt(
                                               model.retrievedTickets[index]);
                                         },
-                                        isAdmin: _modelHome.role,
+                                        isAdmin: _modelHome.isAdmin,
                                       );
                                     }),
                               )

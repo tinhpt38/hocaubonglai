@@ -36,10 +36,10 @@ class _CustomerPageState extends State<CustomerPage> {
           return SafeArea(
               child: Scaffold(
                   appBar: AppBar(
-                    centerTitle: !_modelHome.role,
+                    centerTitle: !_modelHome.isAdmin,
                     title: const Text('Danh sách khách hàng'),
                     actions: [
-                      _modelHome.role == true
+                      _modelHome.isAdmin == true
                           ? ElevatedButton.icon(
                               onPressed: () {
                                 showModalBottomSheet<void>(
@@ -155,7 +155,7 @@ class _CustomerPageState extends State<CustomerPage> {
                                   title: Text(customers.fullname.toString()),
                                   subtitle: Text(customers.phone.toString()),
                                   trailing: SizedBox(
-                                    width: _modelHome.role == true ? 100 : 50,
+                                    width: _modelHome.isAdmin == true ? 100 : 50,
                                     child: Row(
                                       children: [
                                         IconButton(
@@ -172,7 +172,7 @@ class _CustomerPageState extends State<CustomerPage> {
                                               Icons.call,
                                               color: Colors.green,
                                             )),
-                                        _modelHome.role == true
+                                        _modelHome.isAdmin == true
                                             ? IconButton(
                                                 onPressed: () {
                                                   showDialog(

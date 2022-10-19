@@ -4,6 +4,7 @@ import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:print_ticket/modules/remote_config/remote_config.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
+import 'package:print_ticket/services/authentication/user.cap.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -26,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   initData() async {
     Authentication.initializeFirebase();
     await _authModel.getUser();
+    await _authModel.getRole();
   }
 
   @override
@@ -46,8 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                               return snapshot.hasData
                                   ? RemoteConfigs(
                                       remoteConfig: snapshot.requireData,
-                                      isAdmin: _modelHome.role,
-                                    )
+                                      isAdmin: _authModel.isAdmin)
                                   : const Scaffold(
                                       body: Center(
                                         child: CircularProgressIndicator(),
@@ -72,7 +73,8 @@ class _LoginPageState extends State<LoginPage> {
                     ElevatedButton(
                         onPressed: () async {
                           await _authModel.signInWithGoogle(context);
-                          await _modelHome.getUser();
+                          
+                          // await _modelHome.getUser();
                         },
                         child: const Text('Đăng nhập')),
                   ],

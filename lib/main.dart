@@ -8,6 +8,7 @@ import 'package:print_ticket/modules/permission/permission.model.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 // import 'package:print_ticket/services/hive/hive.service.dart';
 import 'package:provider/provider.dart';
+import 'core/widget/restart.app.dart';
 import 'modules/dashboard/dashboard.model.dart';
 import 'services/authentication/authentication.dart';
 
@@ -34,10 +35,10 @@ void main() async {
     ChangeNotifierProvider(
       create: (context) => PermissionModel(),
     ),
-      ChangeNotifierProvider(
+    ChangeNotifierProvider(
       create: (context) => HomeModel(),
     ),
-  ], child: const MyApp()));
+  ], child: const RestarApp(child: MyApp())));
 }
 
 class MyApp extends StatelessWidget {
@@ -55,4 +56,3 @@ class MyApp extends StatelessWidget {
         home: const LoginPage());
   }
 }
-

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:print_ticket/services/authentication/user.cap.dart';
 
 class Authentication {
   static Future<FirebaseApp> initializeFirebase() async {
@@ -46,6 +47,8 @@ class Authentication {
           accessToken: googleSignInAuthentication.accessToken,
           idToken: googleSignInAuthentication.idToken,
         );
+
+
 
         try {
           final UserCredential userCredential =

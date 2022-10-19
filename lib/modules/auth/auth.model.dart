@@ -5,6 +5,8 @@ import 'package:print_ticket/models/users.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 import 'package:print_ticket/services/repositories/user_repository.dart';
 
+import '../../services/authentication/user.cap.dart';
+
 class AuthModel extends ChangeNotifier {
   User? _user;
   User? get user => _user;
@@ -31,9 +33,18 @@ class AuthModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isAdmin = false;
+  bool get isAdmin => _isAdmin;
+
   signInWithGoogle(BuildContext context) async {
     _user = await Authentication.signInWithGoogle(context: context);
     checkAccount(_user!);
+    
+    notifyListeners();
+  }
+
+  getRole()async{
+    _isAdmin = await UserCap().isAdmin();
     notifyListeners();
   }
 
@@ -70,6 +81,7 @@ class AuthModel extends ChangeNotifier {
     final GoogleSignIn googleSignIn = GoogleSignIn();
     await googleSignIn.disconnect();
     await FirebaseAuth.instance.signOut();
+
 
   }
 }

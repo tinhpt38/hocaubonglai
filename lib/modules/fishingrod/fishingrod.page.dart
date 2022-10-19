@@ -41,10 +41,10 @@ class _FishingrodPageState extends State<FishingrodPage> {
                         onPressed: model.getFishingRods,
                         child: const Icon(Icons.refresh)),
                     appBar: AppBar(
-                      centerTitle: !_modelHome.role,
+                      centerTitle: !_modelHome.isAdmin,
                       title: const Text('Cần câu'),
                       actions: [
-                        _modelHome.role == true
+                        _modelHome.isAdmin == true
                             ? ElevatedButton.icon(
                                 onPressed: () {
                                   show(model, true, '');
@@ -103,7 +103,7 @@ class _FishingrodPageState extends State<FishingrodPage> {
                                         ),
                                         trailing: SizedBox(
                                             width: 100,
-                                            child: _modelHome.role == true
+                                            child: _modelHome.isAdmin == true
                                                 ? Row(
                                                     children: [
                                                       IconButton(

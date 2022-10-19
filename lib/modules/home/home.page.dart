@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/customer/customer.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.page.dart';
 import 'package:print_ticket/modules/home/home.model.dart';
+import 'package:print_ticket/services/authentication/user.cap.dart';
 
 import '../fishingrod/fishingrod.page.dart';
 
@@ -15,9 +16,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  final HomeModel _modelHome = HomeModel();
+  // final HomeModel _modelHome = HomeModel();
   int _selectedIndex = 0;
+
+  bool _isAdmin = false;
+
+  @override
+  initState() {
+    super.initState();
+    getRoles();
+  }
+
+  getRoles() async {
+    bool val = await UserCap().isAdmin();
+    setState(() {
+      _isAdmin = val;
+    });
+  }
 
   getPage() {
     switch (_selectedIndex) {
@@ -63,7 +78,7 @@ class _HomePageState extends State<HomePage> {
     ];
 
     return Scaffold(
-      body: widget.isAdmin == true ? getPage() : getPage1(),
+      body: _isAdmin ? getPage() : getPage1(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (value) {
@@ -71,7 +86,7 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = value;
           });
         },
-        items: widget.isAdmin == true ? listBottom : listBottom1,
+        items: _isAdmin ? listBottom : listBottom1,
       ),
     );
   }
