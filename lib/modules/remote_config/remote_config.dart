@@ -4,10 +4,9 @@ import 'package:print_ticket/modules/home/home.page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RemoteConfigs extends AnimatedWidget {
-  const RemoteConfigs({
-    super.key,
-    required this.remoteConfig,
-  }) : super(listenable: remoteConfig);
+  final bool isAdmin;
+   const RemoteConfigs({super.key, required this.remoteConfig, required this.isAdmin})
+      : super(listenable: remoteConfig);
 
   final FirebaseRemoteConfig remoteConfig;
 
@@ -51,7 +50,9 @@ class RemoteConfigs extends AnimatedWidget {
   }
 
   Widget _loginApp(BuildContext context) {
-    return const HomePage();
+    return  HomePage(
+      isAdmin: isAdmin,
+    );
   }
 }
 

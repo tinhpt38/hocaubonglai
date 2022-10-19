@@ -1,4 +1,3 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
@@ -34,9 +33,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   initData() async {
-    await _modelHome.getUser();
     await _model.getTicketBox();
-    // _model.onScanPressed();
     await _model.connectDevice();
     await _model.prepareStorage();
   }
@@ -126,21 +123,23 @@ class _DashboardPageState extends State<DashboardPage> {
                                     title: 'Tìm kiếm máy in')));
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(
-                        Icons.import_export,
-                        color: Colors.blue,
-                      ),
-                      title: const Text(
-                        'Xuất excel',
-                        style: TextStyle(
-                          color: Colors.blue,
-                        ),
-                      ),
-                      onTap: () {
-                        _dialogExcel(context, model);
-                      },
-                    ),
+                    _modelHome.role == true
+                        ? ListTile(
+                            leading: const Icon(
+                              Icons.import_export,
+                              color: Colors.blue,
+                            ),
+                            title: const Text(
+                              'Xuất excel',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                            onTap: () {
+                              _dialogExcel(context, model);
+                            },
+                          )
+                        : Container(),
                     _modelHome.role == true
                         ? ListTile(
                             leading: const Icon(
@@ -200,19 +199,23 @@ class _DashboardPageState extends State<DashboardPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                child: Center(
-                                  child: Text(
-                                    'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
+                              _modelHome.role == true
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      child: Center(
+                                        child: Text(
+                                          'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(
+                                      height: 10,
                                     ),
-                                  ),
-                                ),
-                              ),
                               Expanded(
                                 flex: 1,
                                 child: ListView.builder(
@@ -270,8 +273,8 @@ class _DashboardPageState extends State<DashboardPage> {
               },
             ),
             TextButton(
-                onPressed: ()  {
-                   DatePicker.showPicker(context, onConfirm: (time) {
+                onPressed: () {
+                  DatePicker.showPicker(context, onConfirm: (time) {
                     setState(() {
                       month = '${time.month}/${time.year}';
                       (model.rootPath != null)
@@ -281,7 +284,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       // ignore: use_build_context_synchronously
                       // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     });
-                   
                   },
                       pickerModel: CustomMonthPicker(
                           minTime: DateTime(2022, 9, 1),

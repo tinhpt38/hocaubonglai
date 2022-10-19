@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/customer/customer.model.dart';
+import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:print_ticket/modules/permission/permission.model.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 // import 'package:print_ticket/services/hive/hive.service.dart';
@@ -32,6 +33,9 @@ void main() async {
     ),
     ChangeNotifierProvider(
       create: (context) => PermissionModel(),
+    ),
+      ChangeNotifierProvider(
+      create: (context) => HomeModel(),
     ),
   ], child: const MyApp()));
 }

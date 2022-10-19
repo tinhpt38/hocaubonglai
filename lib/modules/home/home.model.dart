@@ -29,10 +29,12 @@ class HomeModel extends ChangeNotifier {
       if (_retrievedUsers[emailList.indexOf(value.email.toString())].role ==
           'Nhân viên') {
         _role = false;
+        print(_role);
       } else if (_retrievedUsers[emailList.indexOf(value.email.toString())]
               .role ==
           'Admin') {
         _role = true;
+        print(_role);
       }
     } else {}
     notifyListeners();

@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:print_ticket/models/users.dart';
-import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 import 'package:print_ticket/services/repositories/user_repository.dart';
 
@@ -68,7 +67,9 @@ class AuthModel extends ChangeNotifier {
   }
 
   logout() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    await googleSignIn.disconnect();
+    // final GoogleSignIn googleSignIn = GoogleSignIn();
+    // await googleSignIn.disconnect();
+    await FirebaseAuth.instance.signOut();
+
   }
 }
