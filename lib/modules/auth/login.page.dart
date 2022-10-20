@@ -1,7 +1,6 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
-import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:print_ticket/modules/remote_config/remote_config.dart';
 import 'package:print_ticket/services/authentication/authentication.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +14,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final AuthModel _authModel = AuthModel();
-  final HomeModel _modelHome = HomeModel();
 
   @override
   void initState() {
@@ -71,11 +69,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     ElevatedButton(
                         onPressed: () async {
-                          await _authModel.getUser();
-                          // ignore: use_build_context_synchronously
+                          _authModel.getUser();
                           await _authModel.signInWithGoogle(context);
-                          
-                          // await _modelHome.getUser();
                         },
                         child: const Text('Đăng nhập')),
                   ],

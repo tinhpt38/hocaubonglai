@@ -15,7 +15,6 @@ class CustomerPage extends StatefulWidget {
 class _CustomerPageState extends State<CustomerPage> {
   final CustomerModel _model = CustomerModel();
   final _formKey = GlobalKey<FormState>();
-  final HomeModel _modelHome = HomeModel();
   @override
   void initState() {
     super.initState();
@@ -24,7 +23,6 @@ class _CustomerPageState extends State<CustomerPage> {
 
   initData() async {
     _model.getCustomer();
-    _modelHome.getUser();
   }
 
   @override
@@ -36,102 +34,94 @@ class _CustomerPageState extends State<CustomerPage> {
           return SafeArea(
               child: Scaffold(
                   appBar: AppBar(
-                    centerTitle: !_modelHome.isAdmin,
                     title: const Text('Danh sách khách hàng'),
                     actions: [
-                      _modelHome.isAdmin == true
-                          ? ElevatedButton.icon(
-                              onPressed: () {
-                                showModalBottomSheet<void>(
-                                  context: context,
-                                  enableDrag: false,
-                                  isScrollControlled: true,
-                                  builder: (BuildContext context) {
-                                    return Padding(
-                                      padding:
-                                          MediaQuery.of(context).viewInsets,
-                                      child: Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                1 /
-                                                3,
-                                        color: Colors.grey[100],
-                                        child: Form(
-                                          key: _formKey,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: TextFormField(
-                                                        controller: model
-                                                            .fullNameController,
-                                                        validator: (value) {
-                                                          if (value == null ||
-                                                              value.isEmpty) {
-                                                            return 'Điền tên khách hàng';
-                                                          }
-                                                          return null;
-                                                        },
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          labelText:
-                                                              'Tên khách hàng *',
-                                                        )),
-                                                  )),
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: TextFormField(
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        controller: model
-                                                            .phoneController,
-                                                        validator: (value) {
-                                                          if (value == null ||
-                                                              value.isEmpty) {
-                                                            return 'Điền số điện thoại';
-                                                          }
-                                                          return null;
-                                                        },
-                                                        decoration:
-                                                            const InputDecoration(
-                                                          labelText:
-                                                              'Số điện thoại *',
-                                                        )),
-                                                  )),
-                                              ElevatedButton(
-                                                  onPressed: () {
-                                                    if (_formKey.currentState!
-                                                        .validate()) {
-                                                      model.createCustomer();
-                                                      Navigator.pop(context);
-                                                    }
-                                                  },
-                                                  child: const Text('Tạo')),
-                                              const SizedBox(
-                                                height: 64,
-                                              )
-                                            ],
-                                          ),
-                                        ),
+                      ElevatedButton.icon(
+                          onPressed: () {
+                            showModalBottomSheet<void>(
+                              context: context,
+                              enableDrag: false,
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return Padding(
+                                  padding: MediaQuery.of(context).viewInsets,
+                                  child: Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        1 /
+                                        3,
+                                    color: Colors.grey[100],
+                                    child: Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Expanded(
+                                              flex: 1,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                    controller: model
+                                                        .fullNameController,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Điền tên khách hàng';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText:
+                                                          'Tên khách hàng *',
+                                                    )),
+                                              )),
+                                          Expanded(
+                                              flex: 1,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: TextFormField(
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    controller:
+                                                        model.phoneController,
+                                                    validator: (value) {
+                                                      if (value == null ||
+                                                          value.isEmpty) {
+                                                        return 'Điền số điện thoại';
+                                                      }
+                                                      return null;
+                                                    },
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      labelText:
+                                                          'Số điện thoại *',
+                                                    )),
+                                              )),
+                                          ElevatedButton(
+                                              onPressed: () {
+                                                if (_formKey.currentState!
+                                                    .validate()) {
+                                                  model.createCustomer();
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              child: const Text('Tạo')),
+                                          const SizedBox(
+                                            height: 64,
+                                          )
+                                        ],
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
                                 );
                               },
-                              icon: const Icon(Icons.add),
-                              label: const Text('Thêm'))
-                          : Container()
+                            );
+                          },
+                          icon: const Icon(Icons.add),
+                          label: const Text('Thêm'))
                     ],
                   ),
                   floatingActionButton: FloatingActionButton(
@@ -155,7 +145,7 @@ class _CustomerPageState extends State<CustomerPage> {
                                   title: Text(customers.fullname.toString()),
                                   subtitle: Text(customers.phone.toString()),
                                   trailing: SizedBox(
-                                    width: _modelHome.isAdmin == true ? 100 : 50,
+                                    width: 100,
                                     child: Row(
                                       children: [
                                         IconButton(
@@ -172,57 +162,51 @@ class _CustomerPageState extends State<CustomerPage> {
                                               Icons.call,
                                               color: Colors.green,
                                             )),
-                                        _modelHome.isAdmin == true
-                                            ? IconButton(
-                                                onPressed: () {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (
-                                                        BuildContext context,
-                                                      ) =>
-                                                          AlertDialog(
-                                                            title: const Center(
-                                                              child: Text(
-                                                                  'Xóa khách hàng?'),
-                                                            ),
-                                                            content: Text(
-                                                              customers.fullname
-                                                                  .toString(),
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                            actions: <Widget>[
-                                                              TextButton(
-                                                                onPressed: () =>
-                                                                    Navigator.pop(
-                                                                        context,
-                                                                        'Không'),
-                                                                child:
-                                                                    const Text(
-                                                                        'Không'),
-                                                              ),
-                                                              TextButton(
-                                                                onPressed: () {
-                                                                  model.deleteCustomers(
-                                                                      customers
-                                                                          .id
-                                                                          .toString());
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child:
-                                                                    const Text(
-                                                                        'Xóa'),
-                                                              ),
-                                                            ],
-                                                          ));
-                                                },
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                ))
-                                            : Container()
+                                        IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (
+                                                    BuildContext context,
+                                                  ) =>
+                                                      AlertDialog(
+                                                        title: const Center(
+                                                          child: Text(
+                                                              'Xóa khách hàng?'),
+                                                        ),
+                                                        content: Text(
+                                                          customers.fullname
+                                                              .toString(),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context,
+                                                                    'Không'),
+                                                            child: const Text(
+                                                                'Không'),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              model.deleteCustomers(
+                                                                  customers.id
+                                                                      .toString());
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'Xóa'),
+                                                          ),
+                                                        ],
+                                                      ));
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            ))
                                       ],
                                     ),
                                   ),

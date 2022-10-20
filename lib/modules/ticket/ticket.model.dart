@@ -175,6 +175,5 @@ class TicketModel extends ChangeNotifier {
         'phone': phoneController.text
       }));
     }
-    notifyListeners();
   }
 }

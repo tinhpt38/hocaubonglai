@@ -39,11 +39,11 @@ class AuthModel extends ChangeNotifier {
   signInWithGoogle(BuildContext context) async {
     _user = await Authentication.signInWithGoogle(context: context);
     checkAccount(_user!);
-    
+
     notifyListeners();
   }
 
-  getRole()async{
+  getRole() async {
     _isAdmin = await UserCap().isAdmin();
     notifyListeners();
   }
@@ -81,7 +81,5 @@ class AuthModel extends ChangeNotifier {
     final GoogleSignIn googleSignIn = GoogleSignIn();
     await googleSignIn.disconnect();
     await FirebaseAuth.instance.signOut();
-
-
   }
 }

@@ -20,15 +20,6 @@ class UserCap {
     Users compareUser =
         _users.firstWhere((element) => element.email == _userLogined.email);
     return compareUser.role == "Admin";
-
-    // String? selectedEmail = emailList.firstWhere((e) => e == value.email);
-    // // ignore: unnecessary_null_comparison
-    // if (selectedEmail != null) {
-    //   int indexOf = emailList.indexOf(selectedEmail);
-    //   _isAdmin = _retrievedUsers[indexOf].role == "Admin";
-    // } else {
-    //   _isAdmin = false;
-    // }
   }
 
   UserCap._interal();

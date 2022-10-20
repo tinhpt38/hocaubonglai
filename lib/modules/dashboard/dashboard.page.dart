@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:print_ticket/core/widget/restart.app.dart';
 import 'package:print_ticket/modules/auth/auth.model.dart';
 import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
@@ -176,7 +175,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       onTap: () async {
                         await _auth.logout();
-                        // RestarApp.restartApp(context);
+                        // ignore: use_build_context_synchronously
                         Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
@@ -209,7 +208,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         child: Text(
                                           'TỔNG TIỀN HÔM NAY: ${model.totalPrice} K',
                                           style: const TextStyle(
-                                            fontSize: 24,
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -227,8 +226,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                         ticket: model.retrievedTickets[index],
                                         onDeleteClick: model,
                                         onPrintClick: () async {
-                                          // await model
-                                          //     .onPrint(model.tickets[index]);
                                           await _model.onPrintReceipt(
                                               model.retrievedTickets[index]);
                                         },
@@ -240,8 +237,13 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                         );
                       } else {
-                        return const Center(
-                          child: Text('Chưa có dữ liệu!'),
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            await _model.getTicketBox();
+                          },
+                          child: const Center(
+                            child: Text('Chưa có dữ liệu!'),
+                          ),
                         );
                       }
                     }),
@@ -282,9 +284,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       (model.rootPath != null)
                           ? model.exportExcel(context, month, false)
                           : null;
-
-                      // ignore: use_build_context_synchronously
-                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     });
                   },
                       pickerModel: CustomMonthPicker(

@@ -14,7 +14,6 @@ class PermissionPage extends StatefulWidget {
 class _PermissionPageState extends State<PermissionPage> {
   final PermissionModel _model = PermissionModel();
   final HomeModel _modelHome = HomeModel();
-
   @override
   void initState() {
     super.initState();
