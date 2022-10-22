@@ -61,8 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 centerTitle: !_modelHome.isAdmin,
                 title: const Text('CÁC VÉ HÔM NAY'),
                 actions: [
-                  _modelHome.isAdmin == true
-                      ? ElevatedButton.icon(
+                ElevatedButton.icon(
                           icon: const Icon(Icons.add),
                           onPressed: () async {
                             await Navigator.push(
@@ -73,7 +72,6 @@ class _DashboardPageState extends State<DashboardPage> {
                           },
                           label: const Text('Thêm'),
                         )
-                      : Container()
                 ],
               ),
               drawer: Drawer(

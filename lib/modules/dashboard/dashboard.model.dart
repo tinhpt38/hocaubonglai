@@ -56,10 +56,8 @@ class DashboardModel extends ChangeNotifier {
     _retrievedTickets =
         await _ticketRepo.retrieveTicket(getCurrentDate.toString());
     _ticketsList = _ticketRepo.retrieveTicket(getCurrentDate.toString());
-
-    // _getAllTicket = await _ticketRepo.retrieveAllTicket();
-
-    // print(_retrievedTickets[0].timeIn.toString().substring(6, 16));
+    _retrievedTickets
+        .sort((b, a) => a.timeIn.toString().compareTo(b.timeIn.toString()));
     for (var i = 0; i < _retrievedTickets.length; i++) {
       _listPrice.add(double.tryParse(_retrievedTickets[i].price.toString())!);
     }
@@ -152,8 +150,8 @@ class DashboardModel extends ChangeNotifier {
   }
 
   connectDevice() async {
-    final SharedPreferences _prefs = await SharedPreferences.getInstance();
-    String? value = _prefs.getString('selectedDevice');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? value = prefs.getString('selectedDevice');
     if (value == null) {
       await onScanPressed();
     } else {
@@ -287,7 +285,7 @@ class DashboardModel extends ChangeNotifier {
         size: ReceiptTextSizeType.large,
         style: ReceiptTextStyleType.bold);
     receiptText.addSpacer(useDashed: true);
-    receiptText.addLeftRightText( 
+    receiptText.addLeftRightText(
       'Giờ vào:',
       DateFormat('HH:mm dd/MM/yyyy')
           .format(convertStringToDateTime(ticket.timeIn!)),
