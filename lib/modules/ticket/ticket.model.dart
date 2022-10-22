@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:print_ticket/models/customers.dart';
@@ -6,7 +5,6 @@ import 'package:print_ticket/models/fishingrods.dart';
 import '../../services/repositories/customer_repository.dart';
 import '../../services/repositories/fishingrod.repository.dart';
 import '../../services/repositories/ticket_repository.dart';
-import '../dashboard/dashboard.model.dart';
 
 class TicketModel extends ChangeNotifier {
   TicketRepository ticketRepo = TicketRepository();
@@ -150,7 +148,11 @@ class TicketModel extends ChangeNotifier {
   double _total = 0;
   double get total => _total;
 
-  final DashboardModel _dashboardModel = DashboardModel();
+  String get getCurrentDate {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd/MM/yyyy').format(now);
+    return formattedDate;
+  }
 
   createTicket() async {
     await ticketRepo.ticketBox.add(({
@@ -161,7 +163,10 @@ class TicketModel extends ChangeNotifier {
       'fishingrodQuantity': _fishingroldQuantityController.text,
       'seats': _seatsController.text,
       'timeIn': _timeIn,
-      'timeOut': _timeOut
+      'timeOut': _timeOut,
+      'createAt': getCurrentDate,
+      'createAtMonth': getCurrentDate.substring(3, 10),
+      'count': int.parse(liveStageController.text),
     }));
     if (phoneCustomers.contains(phoneController.text)) {
     } else {
@@ -169,10 +174,6 @@ class TicketModel extends ChangeNotifier {
         'fullname': fullNameController.text,
         'phone': phoneController.text
       }));
-
-      notifyListeners();
     }
-    await _dashboardModel.getTicketBox();
-    notifyListeners();
   }
 }

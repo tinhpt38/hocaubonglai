@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:print_ticket/modules/ticket/ticket.model.dart';
 import 'package:provider/provider.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-
-import '../dashboard/dashboard.model.dart';
 
 class TicketPage extends StatefulWidget {
   const TicketPage({super.key});
@@ -15,7 +12,7 @@ class TicketPage extends StatefulWidget {
 
 class _TicketPageState extends State<TicketPage> {
   final TicketModel _model = TicketModel();
-  final _addTicktFormKey = GlobalKey<FormState>();
+  final _addTicketFormKey = GlobalKey<FormState>();
   @override
   initState() {
     super.initState();
@@ -26,8 +23,6 @@ class _TicketPageState extends State<TicketPage> {
     await _model.getCustomer();
     await _model.getFishingRod();
   }
-
-  final DashboardModel _dashboardModel = DashboardModel();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +42,7 @@ class _TicketPageState extends State<TicketPage> {
                 ),
                 body: SingleChildScrollView(
                   child: Form(
-                    key: _addTicktFormKey,
+                    key: _addTicketFormKey,
                     child: Column(
                       children: [
                         Row(
@@ -80,7 +75,7 @@ class _TicketPageState extends State<TicketPage> {
                                         onChanged: _model.setNameFromPhone,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
-                                            return 'Điền số điện thoại khách hàng';
+                                            return 'Điền số điện thoại khách hàng!';
                                           }
                                           return null;
                                         },
@@ -92,7 +87,7 @@ class _TicketPageState extends State<TicketPage> {
                                           ..text,
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
-                                            return 'Điền họ tên khách hàng';
+                                            return 'Điền họ tên khách hàng!';
                                           }
                                           return null;
                                         },
@@ -146,6 +141,13 @@ class _TicketPageState extends State<TicketPage> {
                                             model.setTimeOut();
                                             model.getPrice();
                                           },
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Điền số ca!';
+                                            }
+                                            return null;
+                                          },
                                           decoration: const InputDecoration(
                                             hintText: 'Nhập vào số ca',
                                             labelText: 'Số ca:',
@@ -172,6 +174,13 @@ class _TicketPageState extends State<TicketPage> {
                                             child: TextFormField(
                                                 controller:
                                                     model.seatsController,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Điền vị trí ngồi!';
+                                                  }
+                                                  return null;
+                                                },
                                                 decoration:
                                                     const InputDecoration(
                                                   labelText: 'Vị trí ngồi:',
@@ -186,6 +195,13 @@ class _TicketPageState extends State<TicketPage> {
                                           controller: model
                                               .fishingroldQuantityController,
                                           keyboardType: TextInputType.number,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Điền số cần!';
+                                            }
+                                            return null;
+                                          },
                                           onChanged: (_) {
                                             model.getPrice();
                                           },
@@ -203,15 +219,22 @@ class _TicketPageState extends State<TicketPage> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: DropdownButtonHideUnderline(
-                                        child: DropdownButton2(
+                                        child: DropdownButtonFormField(
                                           hint: const Text(''),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Chọn cần câu!';
+                                            }
+                                            return null;
+                                          },
                                           isExpanded: true,
                                           items: model.fishingRodName
                                               .map((item) =>
                                                   DropdownMenuItem<String>(
                                                     value: item,
                                                     child: Text(
-                                                      '$item VNĐ',
+                                                      '$item K',
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                     ),
@@ -232,7 +255,7 @@ class _TicketPageState extends State<TicketPage> {
                                           border: Border.all(
                                               color: Colors.black87, width: 1)),
                                       child: Text(
-                                        'Giá vé: ${model.total} VNĐ',
+                                        'Giá vé: ${model.total} K',
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                             fontSize: 24,
@@ -245,17 +268,13 @@ class _TicketPageState extends State<TicketPage> {
                                     Center(
                                       child: ElevatedButton(
                                           onPressed: () async {
-                                            model.createTicket();
-                                            // Navigator.pushAndRemoveUntil(
-                                            //   context,
-                                            //   MaterialPageRoute(
-                                            //       builder: (context) =>
-                                            //           const DashboardPage()),
-                                            //   (Route<dynamic> route) => false,
-                                            // );
-                                            Navigator.pop(context);
+                                            if (_addTicketFormKey.currentState!
+                                                .validate()) {
+                                              model.createTicket();
+                                              Navigator.pop(context);
+                                            }
                                           },
-                                          child: const Text('TẠO VÀ IN VÉ')),
+                                          child: const Text('TẠO VÉ')),
                                     )
                                   ],
                                 ),

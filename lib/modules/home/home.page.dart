@@ -2,18 +2,37 @@ import 'package:flutter/material.dart';
 
 import 'package:print_ticket/modules/customer/customer.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.page.dart';
+import 'package:print_ticket/modules/home/home.model.dart';
+import 'package:print_ticket/services/authentication/user.cap.dart';
 
 import '../fishingrod/fishingrod.page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final bool isAdmin;
+  const HomePage({super.key, required this.isAdmin});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  // final HomeModel _modelHome = HomeModel();
   int _selectedIndex = 0;
+
+  bool _isAdmin = false;
+
+  @override
+  initState() {
+    super.initState();
+    getRoles();
+  }
+
+  getRoles() async {
+    bool val = await UserCap().isAdmin();
+    setState(() {
+      _isAdmin = val;
+    });
+  }
 
   getPage() {
     switch (_selectedIndex) {
@@ -29,26 +48,37 @@ class _HomePageState extends State<HomePage> {
         {
           return const FishingrodPage();
         }
-      case 3:
+    }
+  }
+
+  getPage1() {
+    switch (_selectedIndex) {
+      case 0:
         {
-          // return  MyHomePage(title: 'Print config',);
-          // return  PrintApp();
+          return const DashboardPage();
+        }
+      case 1:
+        {
+          return const FishingrodPage();
         }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    List<BottomNavigationBarItem> listBottom = const [
+      BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+      BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Khách'),
+      BottomNavigationBarItem(icon: Icon(Icons.line_axis), label: 'Cần câu'),
+    ];
+
+    List<BottomNavigationBarItem> listBottom1 = const [
+      BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
+      BottomNavigationBarItem(icon: Icon(Icons.line_axis), label: 'Cần câu'),
+    ];
+
     return Scaffold(
-      body: getPage(),
-      // floatingActionButton: FloatingActionButton(
-      //   heroTag: "printApp",
-      //   onPressed: () {
-      //     Navigator.push(context,
-      //         MaterialPageRoute(builder: (context) =>  DemoPrintPage(title: 'Demo Print Page',)));
-      //   },
-      //   child: const Icon(Icons.add),
-      // ),
+      body: _isAdmin ? getPage() : getPage1(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (value) {
@@ -56,14 +86,7 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = value;
           });
         },
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.dashboard), label: 'Dashboard'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Khách'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.line_axis), label: 'Cần câu'),
-          // BottomNavigationBarItem(icon: Icon(Icons.print), label: 'Config')
-        ],
+        items: _isAdmin ? listBottom : listBottom1,
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:print_ticket/services/authentication/user.cap.dart';
 
 class Authentication {
   static Future<FirebaseApp> initializeFirebase() async {
@@ -11,9 +12,14 @@ class Authentication {
     return firebaseApp;
   }
 
+  // void logout() async {
+  //   final GoogleSignIn googleSignIn = GoogleSignIn();
+  //   await googleSignIn.disconnect();
+  // }
+
   static Future<User?> signInWithGoogle({required BuildContext context}) async {
     Firebase.initializeApp();
-    FirebaseAuth auth =  FirebaseAuth.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
     User? user;
 
     if (kIsWeb) {
@@ -41,6 +47,8 @@ class Authentication {
           accessToken: googleSignInAuthentication.accessToken,
           idToken: googleSignInAuthentication.idToken,
         );
+
+
 
         try {
           final UserCredential userCredential =

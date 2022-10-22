@@ -38,6 +38,13 @@ class FishingrodModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  setData(String codeRod, String nameRod, String price) {
+    _fishingrodCodeController.text = codeRod;
+    _fishingrodNameController.text = nameRod;
+    _fishingrodPriceController.text = price;
+    notifyListeners();
+  }
+
   updateFishingRod(String fishingRodsID) async {
     await fishingRodRepo.fishingRods.doc(fishingRodsID).update({
       'name': _fishingrodNameController.text,

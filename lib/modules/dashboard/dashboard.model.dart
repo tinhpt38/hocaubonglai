@@ -3,12 +3,17 @@ import 'dart:io' as io;
 import 'package:blue_print_pos/blue_print_pos.dart';
 import 'package:blue_print_pos/models/blue_device.dart';
 import 'package:blue_print_pos/models/connection_status.dart';
+import 'package:blue_print_pos/receipt/receipt.dart';
+import 'package:blue_print_pos/receipt/receipt_section_text.dart';
+import 'package:blue_print_pos/receipt/receipt_text_size_type.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils.dart';
 import 'package:excel/excel.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/tickets.dart';
 import '../../services/repositories/ticket_repository.dart';
@@ -27,7 +32,6 @@ class DashboardModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   final TicketRepository _ticketRepo = TicketRepository();
-
   setIsLoading(bool value) {
     _isLoading = value;
     notifyListeners();
@@ -36,28 +40,36 @@ class DashboardModel extends ChangeNotifier {
   List<Tickets> _retrievedTickets = [];
   List<Tickets> get retrievedTickets => _retrievedTickets;
 
+  List<Tickets> _getAllTicket = [];
+  List<Tickets> get getAllTicket => _getAllTicket;
+
   Future<List<Tickets>>? _ticketsList;
   Future<List<Tickets>>? get ticketsList => _ticketsList;
+
+  Future<List<Tickets>>? _ticketsList1;
+  Future<List<Tickets>>? get ticketsList1 => _ticketsList1;
   List _listPrice = [];
 
   getTicketBox() async {
     setIsLoading(true);
     _listPrice = [];
-    _retrievedTickets = await _ticketRepo.retrieveTicket();
-    _ticketsList = _ticketRepo.retrieveTicket();
+    _retrievedTickets =
+        await _ticketRepo.retrieveTicket(getCurrentDate.toString());
+    _ticketsList = _ticketRepo.retrieveTicket(getCurrentDate.toString());
+    _retrievedTickets
+        .sort((b, a) => a.timeIn.toString().compareTo(b.timeIn.toString()));
     for (var i = 0; i < _retrievedTickets.length; i++) {
       _listPrice.add(double.tryParse(_retrievedTickets[i].price.toString())!);
     }
     setIsLoading(false);
-    getTotalToday();
+    getPriceToday();
     notifyListeners();
   }
 
-  getTotalToday() {
+  getPriceToday() {
     if (_listPrice.isNotEmpty) {
       _totalPrice = _listPrice.reduce((value, element) => value + element);
     }
-
     notifyListeners();
   }
 
@@ -137,6 +149,37 @@ class DashboardModel extends ChangeNotifier {
     });
   }
 
+  connectDevice() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? value = prefs.getString('selectedDevice');
+    if (value == null) {
+      await onScanPressed();
+    } else {
+      final BlueDevice blueDevice = parseStringToBlueDevice(value);
+      _bluePrintPos.connect(blueDevice).then((ConnectionStatus status) {
+        if (status == ConnectionStatus.connected) {
+          _selectedDevice = blueDevice;
+          notifyListeners();
+        } else if (status == ConnectionStatus.timeout) {
+          _onDisconnectDevice();
+        } else {
+          if (kDebugMode) {
+            print('$runtimeType - something wrong');
+          }
+        }
+        // setState(() => _isLoading = false);
+      });
+    }
+  }
+
+  BlueDevice parseStringToBlueDevice(String deviceString) {
+//  return 'address/ ${device.address} - name/ ${device.name} - type/ ${device.type}';
+    List<String> temp = deviceString.split('-');
+    String address = temp[0].split("/")[1].trim();
+    String name = temp[1].split("/")[1].trim();
+    return BlueDevice(name: name, address: address);
+  }
+
   Directory? _rootPath;
   Directory? get rootPath => _rootPath;
   String? dirPath;
@@ -145,14 +188,16 @@ class DashboardModel extends ChangeNotifier {
     _rootPath = Directory('/storage/emulated/0/');
   }
 
-  Future<void> pickDir(BuildContext context) async {
+  Future<void> exportExcel(BuildContext context, String time, bool day) async {
+    _getAllTicket = await _ticketRepo.retrieveAllTicket(time);
+    bool exported = false;
     final now = DateTime.now();
     String? path = await FilesystemPicker.open(
-      title: 'Select folder',
+      title: 'Chọn nơi lưu',
       context: context,
       rootDirectory: _rootPath!,
       fsType: FilesystemType.folder,
-      pickText: 'Select this folder',
+      pickText: 'Chọn nơi lưu',
       folderIconColor: Colors.teal,
       requestPermission: () async =>
           await Permission.storage.request().isGranted,
@@ -170,12 +215,13 @@ class DashboardModel extends ChangeNotifier {
       'Vị trí',
       'Lọai cần',
       'Số cần',
+      'Số ca',
       'Giờ vào',
       'Giờ ra'
     ];
     sheetObject.insertRowIterables(header, 1);
     int stt = 1;
-    for (var element in _retrievedTickets) {
+    for (var element in (day == true ? _retrievedTickets : _getAllTicket)) {
       List<dynamic> row = [
         stt++,
         element.customer,
@@ -184,8 +230,9 @@ class DashboardModel extends ChangeNotifier {
         element.seats,
         element.fishingrod,
         element.fishingrodQuantity,
+        element.count,
         element.timeIn,
-        element.timeOut
+        element.timeOut,
       ];
       sheetObject.insertRowIterables(row, stt);
       final String fileName =
@@ -196,6 +243,7 @@ class DashboardModel extends ChangeNotifier {
           excelFile.createSync();
         }
         excelFile.writeAsBytesSync(excel.encode()!);
+        exported = true;
       } catch (e) {
         print(e);
       }
@@ -204,109 +252,139 @@ class DashboardModel extends ChangeNotifier {
       content: Text('Đã xuất file!'),
     );
 
-// Find the ScaffoldMessenger in the widget tree
-// and use it to show a SnackBar.
-// ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (exported == true) {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
     notifyListeners();
   }
 
-  // Future<void> onPrintReceipt(Ticket ticket) async {
-  //   setIsPrinting(true);
+  DateTime convertStringToDateTime(String date) {
+    var inputFormat = DateFormat('HH:mm dd/MM/yyyy');
+    var value = inputFormat.parse(date);
+    return value;
+  }
 
-  //   /// Example for Print Text
-  //   final ReceiptSectionText receiptText = ReceiptSectionText();
-  //   // receiptText.addSpacer();
-  //   receiptText.addText(
-  //     'VÉ CÂU HỒ BỒNG LAI',
-  //     size: ReceiptTextSizeType.extraLarge,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addText(DateFormat('dd/MM/yyyy').format(ticket.timeIn!),
-  //       size: ReceiptTextSizeType.extraLarge, style: ReceiptTextStyleType.bold);
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Giờ vào',
-  //     DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeIn!),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Giờ ra',
-  //     DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeOut!),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Vị trí',
-  //     ticket.seats ?? '',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Loại cần',
-  //     ticket.fishingrod?.name ?? '',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'Số cần',
-  //     ticket.fishingrodQuantity.toString(),
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addLeftRightText(
-  //     'GIÁ',
-  //     '${ticket.price.toString()} K',
-  //     leftStyle: ReceiptTextStyleType.normal,
-  //     leftSize: ReceiptTextSizeType.extraLarge,
-  //     rightSize: ReceiptTextSizeType.extraLarge,
-  //     rightStyle: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addSpacer(useDashed: true);
-  //   receiptText.addText(
-  //     'LƯU Ý:',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.normal,
-  //   );
-  //   receiptText.addText(
-  //     'Cần thủ giữ  vé trong suốt ca câu',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   receiptText.addText(
-  //     'Liên hệ: Mr Thanh - 0868211119',
-  //     size: ReceiptTextSizeType.large,
-  //     style: ReceiptTextStyleType.bold,
-  //   );
-  //   // receiptText.addSpacer(count: 2);`
+  Future<void> onPrintReceipt(Tickets ticket) async {
+    setIsPrinting(true);
 
-  //   await _bluePrintPos.printReceiptText(receiptText);
-  //   setIsPrinting(false);
+    /// Example for Print Text
+    final ReceiptSectionText receiptText = ReceiptSectionText();
+    // receiptText.addSpacer();
+    receiptText.addText(
+      'VÉ CÂU HỒ BỒNG LAI',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(
+        DateFormat('dd/MM/yyyy')
+            .format(convertStringToDateTime(ticket.timeIn!)),
+        size: ReceiptTextSizeType.large,
+        style: ReceiptTextStyleType.bold);
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Giờ vào:',
+      DateFormat('HH:mm dd/MM/yyyy')
+          .format(convertStringToDateTime(ticket.timeIn!)),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Giờ ra:',
+      DateFormat('HH:mm dd/MM/yyyy')
+          .format(convertStringToDateTime(ticket.timeOut!)),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Vị trí:',
+      ticket.seats ?? '',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Loại cần:',
+      ticket.fishingrod ?? '',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Số cần:',
+      ticket.fishingrodQuantity.toString(),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
 
-  //   // /// Example for print QR
-  //   // await _bluePrintPos.printQR('https://www.google.com/', size: 250);
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'Số ca:',
+      ticket.count.toString(),
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addLeftRightText(
+      'GIÁ:',
+      '${ticket.price.toString()} K',
+      leftStyle: ReceiptTextStyleType.normal,
+      leftSize: ReceiptTextSizeType.large,
+      rightSize: ReceiptTextSizeType.large,
+      rightStyle: ReceiptTextStyleType.bold,
+    );
+    receiptText.addSpacer(useDashed: true);
+    receiptText.addText(
+      'LƯU Ý:',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.normal,
+    );
+    receiptText.addText(
+      'Cần thủ giữ  vé trong suốt ca câu',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(
+      'Liên hệ: Mr Thanh',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    receiptText.addText(
+      '0868.211.119',
+      size: ReceiptTextSizeType.large,
+      style: ReceiptTextStyleType.bold,
+    );
+    // receiptText.addSpacer(count: 2);`
 
-  //   /// Text after QR
-  //   // final ReceiptSectionText receiptSecondText = ReceiptSectionText();
-  //   // receiptSecondText.addText('Powered by Google',
-  //   //     size: ReceiptTextSizeType.small);
-  //   // receiptSecondText.addSpacer();
-  //   // await _bluePrintPos.printReceiptText(receiptSecondText, feedCount: 1);
-  // }
+    await _bluePrintPos.printReceiptText(receiptText,
+        paperSize: PaperSize.mm72);
+    setIsPrinting(false);
+
+    // /// Example for print QR
+    // await _bluePrintPos.printQR('https://www.google.com/', size: 250);
+
+    /// Text after QR
+    // final ReceiptSectionText receiptSecondText = ReceiptSectionText();
+    // receiptSecondText.addText('Powered by Google',
+    //     size: ReceiptTextSizeType.small);
+    // receiptSecondText.addSpacer();
+    // await _bluePrintPos.printReceiptText(receiptSecondText, feedCount: 1);
+  }
 }

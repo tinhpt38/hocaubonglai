@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:print_ticket/models/customers.dart';
 import 'package:print_ticket/modules/customer/customer.model.dart';
+import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CustomerPage extends StatefulWidget {
   const CustomerPage({super.key});
@@ -13,7 +15,6 @@ class CustomerPage extends StatefulWidget {
 class _CustomerPageState extends State<CustomerPage> {
   final CustomerModel _model = CustomerModel();
   final _formKey = GlobalKey<FormState>();
-
   @override
   void initState() {
     super.initState();
@@ -143,44 +144,72 @@ class _CustomerPageState extends State<CustomerPage> {
                                 child: ListTile(
                                   title: Text(customers.fullname.toString()),
                                   subtitle: Text(customers.phone.toString()),
-                                  trailing: IconButton(
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (
-                                              BuildContext context,
-                                            ) =>
-                                                AlertDialog(
-                                                  title: const Center(
-                                                    child:
-                                                        Text('Xóa khách hàng?'),
-                                                  ),
-                                                  content: Text(
-                                                    customers.fullname
-                                                        .toString(),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              context, 'Không'),
-                                                      child:
-                                                          const Text('Không'),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        model.deleteCustomers(
-                                                            customers.id
-                                                                .toString());
-                                                        Navigator.pop(context);
-                                                      },
-                                                      child: const Text('Xóa'),
-                                                    ),
-                                                  ],
-                                                ));
-                                      },
-                                      icon: const Icon(Icons.delete)),
+                                  trailing: SizedBox(
+                                    width: 100,
+                                    child: Row(
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              var url = Uri.parse(
+                                                  "tel:${customers.phone}");
+                                              if (await canLaunchUrl(url)) {
+                                                await launchUrl(url);
+                                              } else {
+                                                throw 'Could not launch $url';
+                                              }
+                                            },
+                                            icon: const Icon(
+                                              Icons.call,
+                                              color: Colors.green,
+                                            )),
+                                        IconButton(
+                                            onPressed: () {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (
+                                                    BuildContext context,
+                                                  ) =>
+                                                      AlertDialog(
+                                                        title: const Center(
+                                                          child: Text(
+                                                              'Xóa khách hàng?'),
+                                                        ),
+                                                        content: Text(
+                                                          customers.fullname
+                                                              .toString(),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context,
+                                                                    'Không'),
+                                                            child: const Text(
+                                                                'Không'),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              model.deleteCustomers(
+                                                                  customers.id
+                                                                      .toString());
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: const Text(
+                                                                'Xóa'),
+                                                          ),
+                                                        ],
+                                                      ));
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            ))
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               );
                             },

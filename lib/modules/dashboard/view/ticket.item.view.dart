@@ -7,9 +7,14 @@ class TicketItemView extends StatelessWidget {
   final Tickets ticket;
   final DashboardModel? onDeleteClick;
   final VoidCallback? onPrintClick;
+  final bool? isAdmin;
 
   const TicketItemView(
-      {super.key, required this.ticket, this.onDeleteClick, this.onPrintClick});
+      {super.key,
+      required this.ticket,
+      this.onDeleteClick,
+      this.onPrintClick,
+      required this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +74,10 @@ class TicketItemView extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
+              child: Text('Số ca: ${ticket.count}'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
               child: Text('Giờ vào: ${ticket.timeIn}'),
             ),
             Padding(
@@ -78,14 +87,15 @@ class TicketItemView extends StatelessWidget {
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      onDeleteClick?.deleteTicket(ticket.id.toString());
-                    },
-                    child: const Text('XOÁ'),
-                  ),
-                ),
+                    padding: const EdgeInsets.all(8.0),
+                    child: isAdmin == true
+                        ? ElevatedButton(
+                            onPressed: () {
+                              onDeleteClick?.deleteTicket(ticket.id.toString());
+                            },
+                            child: const Text('XOÁ'),
+                          )
+                        : Container()),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
