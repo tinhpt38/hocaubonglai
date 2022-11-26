@@ -278,83 +278,103 @@ class DashboardModel extends ChangeNotifier {
             .format(convertStringToDateTime(ticket.timeIn!)),
         size: ReceiptTextSizeType.large,
         style: ReceiptTextStyleType.bold);
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true );
+    if (ticket.customer != "") {
+      receiptText.addLeftRightText(
+        'Quý KH:',
+        ticket.customer!,
+        leftStyle: ReceiptTextStyleType.normal,
+        leftSize: ReceiptTextSizeType.medium,
+        rightSize: ReceiptTextSizeType.medium,
+        rightStyle: ReceiptTextStyleType.bold,
+      );
+    }
+    if (ticket.phone != "") {
+      receiptText.addLeftRightText(
+        'SĐT:',
+        ticket.phone!,
+        leftStyle: ReceiptTextStyleType.normal,
+        leftSize: ReceiptTextSizeType.medium,
+        rightSize: ReceiptTextSizeType.medium,
+        rightStyle: ReceiptTextStyleType.bold,
+      );
+    }
     receiptText.addLeftRightText(
       'Giờ vào:',
       DateFormat('HH:mm dd/MM/yyyy')
           .format(convertStringToDateTime(ticket.timeIn!)),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Giờ ra:',
       DateFormat('HH:mm dd/MM/yyyy')
           .format(convertStringToDateTime(ticket.timeOut!)),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
-    receiptText.addSpacer(useDashed: true);
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Loại cần:',
       ticket.fishingrod ?? '',
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Số cần:',
       ticket.fishingrodQuantity.toString(),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
 
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Số ca:',
       ticket.count.toString(),
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'GIÁ:',
       '${ticket.price.toString()} K',
       leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
+      leftSize: ReceiptTextSizeType.medium,
+      rightSize: ReceiptTextSizeType.medium,
       rightStyle: ReceiptTextStyleType.bold,
     );
-    receiptText.addSpacer(useDashed: true);
+    // receiptText.addSpacer(useDashed: true);
     receiptText.addText(
       'LƯU Ý:',
-      size: ReceiptTextSizeType.large,
+      size: ReceiptTextSizeType.medium,
       style: ReceiptTextStyleType.normal,
     );
     receiptText.addText(
-      'Cần thủ giữ vé trong suốt ca câu',
-      size: ReceiptTextSizeType.large,
+      'Giữ vé trong suốt ca câu',
+      size: ReceiptTextSizeType.medium,
       style: ReceiptTextStyleType.bold,
     );
     receiptText.addText(
       'Liên hệ: Mr Thanh',
-      size: ReceiptTextSizeType.large,
+      size: ReceiptTextSizeType.medium,
       style: ReceiptTextStyleType.bold,
     );
     receiptText.addText(
       '0868.211.119',
-      size: ReceiptTextSizeType.large,
+      size: ReceiptTextSizeType.medium,
       style: ReceiptTextStyleType.bold,
     );
     // receiptText.addSpacer(count: 2);`
