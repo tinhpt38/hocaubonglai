@@ -57,13 +57,15 @@ class _LoginPageState extends State<LoginPage> {
             });
             return SafeArea(
                 child: Scaffold(
+              backgroundColor: Colors.white,
               body: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.network(
-                        'https://iweb.tatthanh.com.vn/pic/3/blog/images/image(2088).png'),
+                    Image.asset(
+                      'assets/icon.png',
+                    ),
                     const SizedBox(
                       height: 40,
                     ),

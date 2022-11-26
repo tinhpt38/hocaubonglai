@@ -11,10 +11,15 @@ class CustomerRepository {
       for (var doc in querySnapshot.docs) {
         getCustomers.add(Customers(
             id: doc.id,
-            fullname: doc['fullname'].toString(),
-            phone: doc['phone'].toString()));
+            fullname: doc['fullname'].toString() == ''
+                ? 'Admin Test'
+                : doc['fullname'].toString(),
+            phone: doc['phone'].toString() == ''
+                ? '197420'
+                : doc['phone'].toString()));
       }
     });
+
     return getCustomers;
   }
 }

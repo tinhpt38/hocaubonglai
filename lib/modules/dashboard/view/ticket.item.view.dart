@@ -27,42 +27,12 @@ class TicketItemView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('Khách hàng: ${ticket.customer ?? ""}'),
-                    IconButton(
-                        onPressed: () async {
-                          var url = Uri.parse("tel:${ticket.phone}");
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          } else {
-                            throw 'Could not launch $url';
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.call,
-                          color: Colors.green,
-                        ))
-                  ],
-                )),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('SĐT: ${ticket.phone ?? ""}'),
-            ),
-            const Divider(
-              height: 2,
-            ),
+            ticket.customer.toString() == '' && ticket.phone.toString() == ''
+                ? Container()
+                : _infor(context),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text('Giá vé: ${ticket.price.toString()} K'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('Vị trí: ${ticket.seats}'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -110,5 +80,43 @@ class TicketItemView extends StatelessWidget {
             )
           ],
         ));
+  }
+
+  Widget _infor(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('Khách hàng: ${ticket.customer}'),
+                IconButton(
+                    onPressed: () async {
+                      var url = Uri.parse("tel:${ticket.phone}");
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.call,
+                      color: Colors.green,
+                    ))
+              ],
+            )),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('SĐT: ${ticket.phone ?? ""}'),
+        ),
+        const Divider(
+          height: 2,
+        ),
+      ],
+    );
   }
 }

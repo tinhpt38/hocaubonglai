@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:print_ticket/modules/customer/customer.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.page.dart';
-import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:print_ticket/services/authentication/user.cap.dart';
 
 import '../fishingrod/fishingrod.page.dart';
@@ -68,7 +67,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     List<BottomNavigationBarItem> listBottom = const [
       BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-      BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Khách'),
+      BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Khách hàng'),
       BottomNavigationBarItem(icon: Icon(Icons.line_axis), label: 'Cần câu'),
     ];
 

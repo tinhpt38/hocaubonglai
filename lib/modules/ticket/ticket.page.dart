@@ -63,7 +63,7 @@ class _TicketPageState extends State<TicketPage> {
                                             EdgeInsets.symmetric(vertical: 8),
                                         child: Center(
                                           child: Text(
-                                            'THÔNG TIN KHÁCH',
+                                            'THÔNG TIN KHÁCH HÀNG',
                                             style: TextStyle(
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.bold),
@@ -73,24 +73,12 @@ class _TicketPageState extends State<TicketPage> {
                                         controller: model.phoneController,
                                         keyboardType: TextInputType.number,
                                         onChanged: _model.setNameFromPhone,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Điền số điện thoại khách hàng!';
-                                          }
-                                          return null;
-                                        },
                                         decoration: const InputDecoration(
                                           labelText: 'Số điện thoại:',
                                         )),
                                     TextFormField(
-                                        controller: model.fullNameController
-                                          ..text,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Điền họ tên khách hàng!';
-                                          }
-                                          return null;
-                                        },
+                                        controller: model.fullNameController,
+
                                         decoration: const InputDecoration(
                                           labelText: 'Họ tên:',
                                         )),
@@ -165,30 +153,6 @@ class _TicketPageState extends State<TicketPage> {
                                           child:
                                               Text('Giờ ra: ${model.timeOut}'),
                                         )),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 1,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: TextFormField(
-                                                controller:
-                                                    model.seatsController,
-                                                validator: (value) {
-                                                  if (value == null ||
-                                                      value.isEmpty) {
-                                                    return 'Điền vị trí ngồi!';
-                                                  }
-                                                  return null;
-                                                },
-                                                decoration:
-                                                    const InputDecoration(
-                                                  labelText: 'Vị trí ngồi:',
-                                                )),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextFormField(

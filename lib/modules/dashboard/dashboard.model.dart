@@ -81,9 +81,7 @@ class DashboardModel extends ChangeNotifier {
 
   final BluePrintPos _bluePrintPos = BluePrintPos.instance;
   List<BlueDevice> _blueDevices = <BlueDevice>[];
-  BlueDevice? _selectedDevice;
   // bool _isLoading = false;
-  int _loadingAtIndex = -1;
 
   bool _isPrinting = false;
   bool get isPrinting => _isPrinting;
@@ -123,7 +121,6 @@ class DashboardModel extends ChangeNotifier {
   void _onDisconnectDevice() {
     _bluePrintPos.disconnect().then((ConnectionStatus status) {
       if (status == ConnectionStatus.disconnect) {
-        _selectedDevice = null;
         notifyListeners();
       }
     });
@@ -131,12 +128,10 @@ class DashboardModel extends ChangeNotifier {
 
   void onSelectDevice(int index) {
     _isLoading = true;
-    _loadingAtIndex = index;
     notifyListeners();
     final BlueDevice blueDevice = _blueDevices[index];
     _bluePrintPos.connect(blueDevice).then((ConnectionStatus status) {
       if (status == ConnectionStatus.connected) {
-        _selectedDevice = blueDevice;
         notifyListeners();
       } else if (status == ConnectionStatus.timeout) {
         _onDisconnectDevice();
@@ -158,7 +153,6 @@ class DashboardModel extends ChangeNotifier {
       final BlueDevice blueDevice = parseStringToBlueDevice(value);
       _bluePrintPos.connect(blueDevice).then((ConnectionStatus status) {
         if (status == ConnectionStatus.connected) {
-          _selectedDevice = blueDevice;
           notifyListeners();
         } else if (status == ConnectionStatus.timeout) {
           _onDisconnectDevice();
@@ -212,7 +206,7 @@ class DashboardModel extends ChangeNotifier {
       'Tên khách hàng',
       'Số điện thoại',
       'Giá vé',
-      'Vị trí',
+      // 'Vị trí',
       'Lọai cần',
       'Số cần',
       'Số ca',
@@ -227,7 +221,7 @@ class DashboardModel extends ChangeNotifier {
         element.customer,
         element.phone,
         element.price,
-        element.seats,
+        // element.seats,
         element.fishingrod,
         element.fishingrodQuantity,
         element.count,
@@ -305,14 +299,6 @@ class DashboardModel extends ChangeNotifier {
       rightStyle: ReceiptTextStyleType.bold,
     );
     receiptText.addSpacer(useDashed: true);
-    receiptText.addLeftRightText(
-      'Vị trí:',
-      ticket.seats ?? '',
-      leftStyle: ReceiptTextStyleType.normal,
-      leftSize: ReceiptTextSizeType.large,
-      rightSize: ReceiptTextSizeType.large,
-      rightStyle: ReceiptTextStyleType.bold,
-    );
     receiptText.addSpacer(useDashed: true);
     receiptText.addLeftRightText(
       'Loại cần:',
@@ -357,7 +343,7 @@ class DashboardModel extends ChangeNotifier {
       style: ReceiptTextStyleType.normal,
     );
     receiptText.addText(
-      'Cần thủ giữ  vé trong suốt ca câu',
+      'Cần thủ giữ vé trong suốt ca câu',
       size: ReceiptTextSizeType.large,
       style: ReceiptTextStyleType.bold,
     );
