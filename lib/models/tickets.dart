@@ -2,7 +2,7 @@ class Tickets {
   String? id;
   String? timeIn;
   String? timeOut;
-  String? seats;
+  // String? seats;
   String? fishingrod;
   String? fishingrodQuantity;
   double? price;
@@ -13,7 +13,7 @@ class Tickets {
       {this.id,
       this.timeIn,
       this.timeOut,
-      this.seats,
+      // this.seats,
       this.fishingrod,
       this.fishingrodQuantity,
       this.price,

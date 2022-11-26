@@ -5,6 +5,7 @@ import 'package:print_ticket/modules/auth/login.page.dart';
 import 'package:print_ticket/modules/dashboard/dashboard.model.dart';
 import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:print_ticket/modules/permission/permission.page.dart';
+import 'package:print_ticket/modules/statistic/statistic.page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
@@ -61,17 +62,17 @@ class _DashboardPageState extends State<DashboardPage> {
                 centerTitle: !_modelHome.isAdmin,
                 title: const Text('CÁC VÉ HÔM NAY'),
                 actions: [
-                ElevatedButton.icon(
-                          icon: const Icon(Icons.add),
-                          onPressed: () async {
-                            await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const TicketPage()));
-                            model.getTicketBox();
-                          },
-                          label: const Text('Thêm'),
-                        )
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TicketPage()));
+                      model.getTicketBox();
+                    },
+                    label: const Text('Thêm'),
+                  )
                 ],
               ),
               drawer: Drawer(
@@ -157,6 +158,27 @@ class _DashboardPageState extends State<DashboardPage> {
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           const PermissionPage()));
+                            },
+                          )
+                        : Container(),
+                    _modelHome.isAdmin == true
+                        ? ListTile(
+                            leading: const Icon(
+                              Icons.monetization_on,
+                              color: Colors.blue,
+                            ),
+                            title: const Text(
+                              'Thống kê',
+                              style: TextStyle(
+                                color: Colors.blue,
+                              ),
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const StatisticPage()));
                             },
                           )
                         : Container(),

@@ -27,42 +27,12 @@ class TicketItemView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('Tên khách: ${ticket.customer ?? ""}'),
-                    IconButton(
-                        onPressed: () async {
-                          var url = Uri.parse("tel:${ticket.phone}");
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url);
-                          } else {
-                            throw 'Could not launch $url';
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.call,
-                          color: Colors.green,
-                        ))
-                  ],
-                )),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('SĐT: ${ticket.phone ?? ""}'),
-            ),
-            const Divider(
-              height: 2,
-            ),
+            ticket.customer.toString() == '' && ticket.phone.toString() == ''
+                ? Container()
+                : _infor(context),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text('Giá vé: ${ticket.price.toString()} K'),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text('Vị trí: ${ticket.seats}'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -112,59 +82,41 @@ class TicketItemView extends StatelessWidget {
         ));
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Container(
-  //       decoration: BoxDecoration(
-  //           color: Colors.white70, borderRadius: BorderRadius.circular(8)),
-  //       padding: const EdgeInsets.all(12),
-  //       child: Row(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Text(ticket.customer?.fullname ?? ""),
-  //           Text('SĐT: ${ticket.customer?.phone ?? ""}'),
-  //           Text('Giá vé: ${ticket.price.toString()} K'),
-  //           Text('Vị trí: ${ticket.seats}'),
-  //           Text(
-  //               'Loại cần: ${ticket.fishingrod?.name ?? ""} - ${ticket.fishingrodQuantity} cần'),
-  //           Text(
-  //               'Giờ vào: ${DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeIn!)}'),
-  //           Text(
-  //               'Giờ ra: ${DateFormat('HH:mm dd/MM/yyyy').format(ticket.timeOut!)}'),
-  //           const Spacer(),
-  //           Row(
-  //             children: [
-  //               Expanded(
-  //                 flex: 1,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(8.0),
-  //                   child: ElevatedButton(
-  //                     onPressed: () {
-  //                       widget.onDeleteClick != null
-  //                           ? widget.onDeleteClick!()
-  //                           : null;
-  //                     },
-  //                     child: const Text('XOÁ'),
-  //                   ),
-  //                 ),
-  //               ),
-  //               Expanded(
-  //                 flex: 1,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(8.0),
-  //                   child: ElevatedButton(
-  //                     onPressed: () {
-  //                       widget.onPrintClick != null
-  //                           ? widget.onPrintClick!()
-  //                           : null;
-  //                     },
-  //                     child: const Text('IN VÉ'),
-  //                   ),
-  //                 ),
-  //               )
-  //             ],
-  //           )
-  //         ],
-  //       ));
-  // }
+  Widget _infor(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('Khách hàng: ${ticket.customer}'),
+                IconButton(
+                    onPressed: () async {
+                      var url = Uri.parse("tel:${ticket.phone}");
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      } else {
+                        throw 'Could not launch $url';
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.call,
+                      color: Colors.green,
+                    ))
+              ],
+            )),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text('SĐT: ${ticket.phone ?? ""}'),
+        ),
+        const Divider(
+          height: 2,
+        ),
+      ],
+    );
+  }
 }

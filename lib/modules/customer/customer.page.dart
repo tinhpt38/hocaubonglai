@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:print_ticket/models/customers.dart';
 import 'package:print_ticket/modules/customer/customer.model.dart';
-import 'package:print_ticket/modules/home/home.model.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
